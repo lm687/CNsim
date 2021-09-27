@@ -1,0 +1,17 @@
+Package: CNSimGenome
+Title: Simulated genome for CN signature validation
+Description: Simulated genome for CN signature validation
+Version: 1.0
+Author: The Bioconductor Dev Team
+Maintainer: Bioconductor Package Maintainer <maintainer@bioconductor.org>
+Depends: R (>= 3.5.0), BSgenome (>= 1.58.0)
+Imports: BSgenome
+Suggests: 
+License: Artistic-2.0
+organism: none
+common_name: none
+genome: GRCh37
+provider: LM
+release_date: 2021
+source_url: none
+biocViews: AnnotationData, Genetics, BSgenome, none

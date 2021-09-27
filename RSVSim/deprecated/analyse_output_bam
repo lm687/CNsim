@@ -1,0 +1,6 @@
+echo 'Number of reads'
+/Users/morril01/software/samtools-1.13/samtools view -c output/aligned_sim_transloc_reads.bam
+
+echo 'Number of mapped reads'
+/Users/morril01/software/samtools-1.13/samtools view -c  -F 260 output/aligned_sim_transloc_reads.bam
+

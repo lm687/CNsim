@@ -1,0 +1,198 @@
+
+
+\documentclass[11pt,a4paper,roman]{article}  
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{array}
+\usepackage[utf8]{inputenc}
+\usepackage{hyperref}
+%\usepackage{mathcurl}
+\usepackage[scale=0.75]{geometry}
+
+\newcolumntype{L}[1]{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+
+
+\begin{document}
+
+
+\author{Lena Morrill Gavarr\'o}
+\title{Alternative methods to extract CN signatures}
+\date{\today}
+
+\maketitle
+
+Following the rejection from Nature and comments from reviewer \#3, September 2021.
+
+\tableofcontents
+
+\clearpage
+
+\section{Alternatives to NMF as it is}
+\begin{itemize}
+\item Multi-view NMF (features and sum of posters matrix would stay as it is). See Multi-View Clustering via Joint Nonnegative Matrix Factorization, or (and I think it's the same?) integrative NMF.
+\item LDA (but then we need to redefine the features). What Jorge did.
+\end{itemize}
+
+\begin{figure}[h]
+\includegraphics[width=\textwidth]{/Users/morril01/Documents/PhD/other_repos/project_mphil_Jorge/text/figures/joint_nmf.pdf}
+\caption{Current NMF and integrative NMF}
+\end{figure}
+
+\section{The simulation from the reviewer}
+
+There is something slightly wrong in the simulation in that sample 1, 2, etc. have values for feature1 in multiple components, but for feature 2 they are all either 50 or 100, explaining partially why the signatures recovered are different. \emph{Update after meeting 20210916: it's not that the simulation is wrong, but that the number of features that they use (number of CNAs) only has one observation per sample! So the simulation differs from our data in that we don't have any feature for which we only have one observation per sample.}
+
+\paragraph{}
+
+However, despite this apparent problem with their simulation
+\begin{enumerate}
+\item It's true that there is nothing stopping NMF from putting a lot of weight in a feature and very little in another
+\item Re-normalising the signatures doesn't solve the problem.
+\item A straightforward way of preventing this from happening is, as the reviewer says, to use joint (or multi-view) NMF
+\item In my simulations (in which I was trying to recreate the problem that the reviewer refers to) the weights of both features in the signature definitions have been pretty much 0.5 - 0.5 when we use the true number of signatures. See section below.
+\end{enumerate}
+
+%\clearpage
+\subsection{My simulations}
+
+At least in some cases (probably provided the number of estimated signatures is the number of simulated signatures, and we have enough data i.e. segments per sample), the 0.5-0.5 split in probabilities for each of the two features is preserved in the estimates (this is desirable). But, very easily, we can get signatures which have a weight in a feature and no weight in the other (see example of signature 4 the right in Figure~\ref{mysim}, which is what you call \emph{ill-defined} in the review. Ill-defined has another meaning in statistics so, moving forward, I would call it something else.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=.49\textwidth]{/Users/morril01/Documents/PhD/CDA_in_Cancer/code/Nature_cnsigs/figures/simulation_nature_reject_signature_recovery_postnormalisation_ex1.pdf}
+\includegraphics[width=.49\textwidth]{/Users/morril01/Documents/PhD/CDA_in_Cancer/code/Nature_cnsigs/figures/simulation_nature_reject_signature_recovery_optimalk_postnormalisation_ex3.pdf}
+\caption{Satisfactory signature recovery (left) and unsatisfactory signature recovery (right)\label{mysim}}
+\end{figure}
+
+\textbf{Conclusion} From my point of view, even though the simulation is not convincing enough to me, I agree with the point that the reviewer is making.
+
+\paragraph{}
+
+\textbf{Question}: Do we actually \emph{want} signatures that have different weights for different features? e.g. a signature which is just e.g. ``noise from the interaction between two types of signatures'' that captures the extra segments that you get when you have two copy number events one on top of the other. Even if the answer is yes, then our way of analysing signatures individually is wrong, because the exposures no longer represent distinct processes of mutation.
+
+\section{IntNMF}
+In this section we assume we can solve the problem by just ensuring that each signature is defined by all features equally. I am using the R package IntNMF (see paper \url{https://pubmed.ncbi.nlm.nih.gov/28459819/}).
+
+\paragraph{}
+
+I am using the original features/sum of posterior matrix. As there are two features with three components, the maximum rank (i.e. number of signatures) is 2. Removing these two features (bp10MB, osCN) with two components, we can have as many as 5 signatures.
+
+\subsection{Normalisation (or not) of the sum-of-posteriors matrix}
+\emph{Note: this section is technical and not too interesting}
+
+Normalising the values of components within a feature does not give the same results as not normalising them, even though intuitively I thought it would. Using this singular-covariance input matrix (which we get if we normalise it) is fine for the IntNMF algorithm. Using the normalised features seem to give better results, in that there are fewer extreme values/outliers in the exposures.
+
+\paragraph{}
+
+In the output from IntNMF
+\begin{itemize}
+\item Exposures are not normalised sample-wise (as expected)
+\item Weights are not normalised feature-wise (not as expected)
+\item The sum of weights of signatures across features is not even constant (this is what I find most baffling) even though it's quite similar
+\end{itemize}
+
+\subsubsection{Getting normalised signatures}
+\begin{enumerate}
+\item Run IntNMF
+\item Compute the average sum of weights for each signature, across features. This gives a vector $a$
+\item Multiply the extracted exposures matrix $W$ by $(diag(a))^{-1}$, i.e. $\bar{W}=W \cdot (diag(a))^{-1}$
+\item Normalise $\bar{W}$ row-wise (i.e. sample-wise) to get a normalised exposures matrix
+\end{enumerate}
+
+\clearpage
+\subsection{Comparison to NatGen signatures}
+\begin{table}[h]
+\begin{tabular}{L{2in}L{1.5in}lL{2in}}
+\textbf{Input matrix type} & \textbf{Exposures used} & \textbf{k} & \textbf{Comparison to NatGen}\\
+Normalised feature-wise, removing 2 features & Raw, non-normalised & 3 & s2 and s3 have equivalents. s4 to a lesser extent\\
+Normalised feature-wise, removing 2 features & Raw, non-normalised & 4 & s2, s3 s4 and s5 have equivalent signatures in the new ones \\
+Normalised feature-wise, removing 2 features & Raw, non-normalised & 5 & The same; s2, s3 s4 and s5 have equivalent signatures in the new ones\\
+Normalised feature-wise, removing 2 features & Normalised with diagonal matrix as above & 5 & S1, s2, s3 s4 and s5/s7 have equivalent signatures in the new ones\\
+\end{tabular}
+\caption{Comparison of new and previous signatures}
+\end{table}
+
+Most signatures have pretty clear equivalents, with s6 and s7 being exceptions. The two groups defined by (for the most part) s3 and s4 are still recovered even when we only use 2 signatures (see Figure~\ref{two_signatures}).
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=2.7in]{../intNMF/figures/two_clusters_ConsensusMatPlot_fit_pcawg_norm.pdf}
+\includegraphics[width=1.5in]{../intNMF/figures/two_clusters_fit_pcawg_norm.pdf}
+\caption{Using all features, with components normalised feature-wise, with rank $k=2$. The two groups represent the split of s3/s4 in the NatGen signatures.\label{two_signatures}}
+\end{figure}
+
+\emph{$\ast$ To do, suggested by Ruben 20210916: compare signature definitions (although then I have to think whether I need to re-normalise signature definitions per feature or not).}
+
+\emph{$\ast$ 20210916: by ``ill-defined'', in the review+rebuttal, we mean signatures which look weird because e.g. they don't have segment size}
+
+\emph{$\ast$ 20210916: the difference in s3 and s7 is not due to brca/non-brca. s7 is when there is WGD, and s3 is on a diploids genome. If we remove the copy number feature and s3 and s7 should be extracted as a single signature}
+
+\clearpage
+
+\subsubsection{Comparison of exposures}
+Figure~\ref{correlation_exposures} shows the correlation of exposures of original and re-derived signatures.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=5in]{../intNMF/figures/correlation_exposures_several_sig_extractions.pdf}
+\caption{Clustering of exposures with original and re-derived signatures\label{correlation_exposures}}
+\end{figure}
+
+\begin{itemize}
+\item s1: there is an equivalent only in \verb|1_fit_pcawg_norm_fewerfeaturesk5| (i.e. when I haven't normalised the features to create the input matrix, and I haven't re-scaled the output of the NMF), but not to any \verb|*_fit_pcawg_norm_fewerfeaturesk5notnorm|.
+\item s2: similar to \verb|1_fit_pcawg_norm_fewerfeaturesk5notnorm|
+\item s3: with exposures very similar to those of many other signatures, e.g.\\ \verb|4_fit_pcawg_norm_fewerfeaturesk5|
+\item s4: similar to \verb|4_fit_pcawg_norm_fewerfeaturesk5notnorm|
+\item s5: similar to \verb|3_fit_pcawg_norm_fewerfeaturesk5notnorm|
+\item s6: it doesn't haven exposures similar to any other signature (but, in fairness, we only have 5 signatures!)
+\item s7: it doesn't haven exposures similar to any other signature (again, we only have 5 signatures)
+\end{itemize}
+
+
+\subsubsection{Comparison of signature definitions}
+
+\paragraph{Analysis per feature}
+
+\begin{itemize}
+\item segsize: s2, s4 and s5 nearly identical, and similar to many new signatures. s7 and s3 very similar, and very similar to \verb|5_fit_pcawg_norm_fewerfeaturesk5notnorm| and other signatures. s1 similar to plenty of other new signatures, same for s6.
+\item bp10MB: s2, s4 and s5 very similar. s3 and s7 very similar. s1 has an equivalent in \verb|2_fit_pcawg_norm| \emph{(note: this is a feature that is not used when only using 4 features!)}
+\item osCN: s4, s6, s5 and s7 very similar. s3 very different. s1 and s2 very similar, and to \verb|2_fit_pcawg_norm| \emph{(note: this is a feature that is not used when only using 4 features!)}
+\item changepoint: s4 is different to anything else. s6 is similar to many signatures. S5 has many perfect correlates. S1 doesn't have any equivalent. s2, s3 and s7 are all similar to each other and other signatures.
+\item Copy number: s6 and s4 don't really have true equivalents. s5 has a perfect one in \verb|3_fit_pcawg_norm_fewerfeaturesk5notnorm|. s2 and s7 only correlated (heavily) with each other. S1 doesn't have any very clear equivalent.
+\item bpchrarm: s4 has the equivalent in \verb|3_fit_pcawg_norm_fewerfeaturesk5notnorm|, s2 in \verb|4_fit_pcawg_norm_fewerfeaturesk5notnorm|. S5 doesn't have clear equivalents but does correlated heavily with plenty of other signatures. s6 is equivalent to\\ \verb|5_fit_pcawg_norm_fewerfeaturesk5notnorm| and, to a lesser extent, to s3 and s7 (which are nearly-identical but don't have equivalents in \verb|*_fit_pcawg_norm_fewerfeaturesk5notnorm|, only in other types of extracted signatures). S1 correlates very well with many other signatures, including one of the family above: \verb|2_fit_pcawg_norm_fewerfeaturesk5notnorm|.
+\end{itemize}
+
+Figure~\ref{correlation_definitions} shows the overall correlation, when including all features. The definitions of the original signatures have been re-normalised feature-wise. The equivalences are
+
+\begin{table}[h]
+\begin{tabular}{ccc}
+Natgen signature & Re-derived signature & Data supporting equivalence\\
+s1 & \verb|2_fit_pcawg_norm_fewerfeaturesk5notnorm| & Overall signature definition\\
+s2 & \verb|1_fit_pcawg_norm_fewerfeaturesk5notnorm| &Overall signature definition\\
+s3 & none\\
+s4 & \verb|4_fit_pcawg_norm_fewerfeaturesk5notnorm| &Overall signature definition\\
+s5 & \verb|3_fit_pcawg_norm_fewerfeaturesk5notnorm| & Overall signature definition\\
+s7 & \verb|5_fit_pcawg_norm_fewerfeaturesk5notnorm| & Overall signature definition\\
+s6 & none\\
+
+\end{tabular}
+\caption{Equivalences when it comes to signature definitions}
+\end{table}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=5in]{../intNMF/figures/correlation_joint_sig_definitions.pdf}
+\caption{Clustering of signature definitions of original and re-derived signatures\label{correlation_definitions}}
+\end{figure}
+
+\clearpage
+\subsubsection{Conclusion}
+\begin{figure}[h]
+\centering
+\includegraphics[width=5in]{../intNMF/figures/correlation_several_sig_definitions_exposures_tanglegram.pdf}
+\caption{Tanglegram of the clustering of signature definitions and of exposures, for original and re-derived signatures\label{tanglegram}}
+\end{figure}
+
+\end{document}

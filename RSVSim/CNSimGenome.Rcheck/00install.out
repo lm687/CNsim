@@ -1,0 +1,17 @@
+[1] "en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_GB.UTF-8"
+* installing *source* package ‘CNSimGenome’ ...
+** using staged installation
+** R
+** inst
+** byte-compile and prepare package for lazy loading
+[1] "en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_GB.UTF-8"
+Warning messages:
+1: package ‘BiocGenerics’ was built under R version 4.0.5 
+2: package ‘GenomeInfoDb’ was built under R version 4.0.5 
+** help
+*** installing help indices
+** building package indices
+[1] "en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_GB.UTF-8"
+** testing if installed package can be loaded from temporary location
+
+* removing ‘/Users/morril01/Documents/PhD/CDA_in_Cancer/code/Nature_cnsigs/RSVSim/CNSimGenome.Rcheck/CNSimGenome’

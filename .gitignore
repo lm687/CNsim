@@ -1,0 +1,9 @@
+RSVSim/output/
+figures/
+intNMF/figures/
+*aux
+*log
+*gz
+cached_images
+data/
+

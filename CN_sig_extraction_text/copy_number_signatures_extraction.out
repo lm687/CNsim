@@ -1,0 +1,10 @@
+\BOOKMARK [1][-]{section.1}{Alternatives to NMF as it is}{}% 1
+\BOOKMARK [1][-]{section.2}{The simulation from the reviewer}{}% 2
+\BOOKMARK [2][-]{subsection.2.1}{My simulations}{section.2}% 3
+\BOOKMARK [1][-]{section.3}{IntNMF}{}% 4
+\BOOKMARK [2][-]{subsection.3.1}{Normalisation \(or not\) of the sum-of-posteriors matrix}{section.3}% 5
+\BOOKMARK [3][-]{subsubsection.3.1.1}{Getting normalised signatures}{subsection.3.1}% 6
+\BOOKMARK [2][-]{subsection.3.2}{Comparison to NatGen signatures}{section.3}% 7
+\BOOKMARK [3][-]{subsubsection.3.2.1}{Comparison of exposures}{subsection.3.2}% 8
+\BOOKMARK [3][-]{subsubsection.3.2.2}{Comparison of signature definitions}{subsection.3.2}% 9
+\BOOKMARK [3][-]{subsubsection.3.2.3}{Conclusion}{subsection.3.2}% 10
