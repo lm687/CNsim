@@ -6,7 +6,9 @@ library(RSVSim)
 library(optparse)
 option_list = list(
   make_option(c("--name"), type="character", default=NA,
-              help="name (uuid)", metavar="character"))
+              help="name (uuid)", metavar="character"),
+  make_option(c("--genome"), type="character", default=NA,
+              help="name of genome to use", metavar="character"))
 opt_parser = OptionParser(option_list=option_list);
 opt = parse_args(opt_parser);
 
@@ -21,9 +23,24 @@ cat('Reading exposures - still to be implemented')
 exposures <- readLines(paste0("exposures/", opt$name))
 
 ## ------------------------------------------------------------------------------ ##
-genome <- readBStringSet("output/genome.fa", format="fasta",
+
+if(opt$genome == 'genome'){
+  name_genome <- "output/genome/genome.fa"
+}else if(opt$genome == 'genome2'){
+  name_genome <- "output/genome2/genome2.fa"
+}
+
+genome <- readBStringSet(name_genome, format="fasta",
                          nrec=-1L, skip=0L, seek.first.rec=FALSE,
                          use.names=TRUE, with.qualities=FALSE)
+
+if(sum(sapply(names(genome), nchar)) == 0){
+  names(genome) <- 1:length(genome)
+}
+
+## duplicate genome to make it diploid
+genome <- rep(genome, 2)
+names(genome) <- paste0(names(genome), c('a', 'b'))
 
 genome
 
@@ -95,6 +112,10 @@ names(reads_c) = paste0('read', 1:length(reads_c))
 
 # sim_transloc
 
-writeXStringSet(x = reads_c, filepath = paste0("output/reads/sim_transloc_reads", opt$name, ".fa"))
+system(paste0('mkdir -p output/output_', opt$genome))
+system(paste0('mkdir -p output/output_', opt$genome, '/reads/'))
+
+writeXStringSet(x = reads_c, filepath = paste0("output/output_", opt$genome, "/reads/sim_transloc_reads",
+                                               opt$name, ".fa"))
 # writeXStringSet(x = complement(reads_c), filepath = "output/sim_transloc_reads_complement.fa")
 

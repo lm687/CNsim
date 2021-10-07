@@ -1,11 +1,14 @@
 RSVSim/output/
-figures/
+simulation_from_reviewer/figures/
 intNMF/figures/
 *aux
 *log
 *gz
-cached_images
+simulation_from_reviewer/cached_images
 data/
 RSVSim/exposures/
+emails/
+intNMF/figures
+
 
 

@@ -5,33 +5,34 @@ a = [x for x in os.listdir("exposures") if x != '.DS_Store']
 
 rule all:
     input:
-      # expand("output/sim_transloc_reads{name}.fa", name=["3ca706a7-fc97-4b98-ac0f-31fdeec57860"])
-      # expand("output/aligned_sim_transloc_reads{name}.bam", name=["3ca706a7-fc97-4b98-ac0f-31fdeec57860"])
-      expand("output/plots_segmented/plotCN_{name}.pdf", name=a)
+      # expand("output/output_{genome}/reads/sim_transloc_reads{name}.fa", name=a[0], genome = "genome2")
+      # expand("output/output_{genome}/alignments/aligned_sim_transloc_reads{name}.bam", name=a[0], genome = "genome2")
+      expand("output/output_{genome}/plots_segmented/plotCN_{name}.pdf", name=a, genome = "genome2")
 
 rule create_genome:
     input:
         "exposures/{name}"
     output:
-        "output/reads/sim_transloc_reads{name}.fa"
+        "output/output_{genome}/reads/sim_transloc_reads{name}.fa"
     shell:
-        "Rscript 2_create_derivative_genome.R --name {wildcards.name}"
+        # "Rscript 2_create_derivative_genome.R --name {wildcards.name} --genome {{genome}}"
+        "mkdir -p output/output_{wildcards.genome}/reads/; mkdir -p output/output_{wildcards.genome}/reads/; Rscript 2_create_derivative_genome.R --name {wildcards.name} --genome {wildcards.genome}"
 
 rule align_bwa:
     input:
-        "output/reads/sim_transloc_reads{name}.fa"
+        "output/output_{genome}/reads/sim_transloc_reads{name}.fa"
     output:
-        "output/alignments/aligned_sim_transloc_reads{name}.bam"
+        "output/output_{genome}/alignments/aligned_sim_transloc_reads{name}.bam"
     shell:
-        "/Users/morril01/anaconda3/pkgs/bwa-0.7.17-h2573ce8_7/bin/bwa mem -k 5 -a output/genome.fa \
-        output/reads/sim_transloc_reads{wildcards.name}.fa | /Users/morril01/software/samtools-1.13/samtools sort -o output/alignments/aligned_sim_transloc_reads{wildcards.name}.bam -; \
-        /Users/morril01/software/samtools-1.13/samtools index output/alignments/aligned_sim_transloc_reads{wildcards.name}.bam"
+        "/Users/morril01/anaconda3/pkgs/bwa-0.7.17-h2573ce8_7/bin/bwa index output/{wildcards.genome}/{wildcards.genome}.fa; mkdir -p output/output_{wildcards.genome}/alignments/; /Users/morril01/anaconda3/pkgs/bwa-0.7.17-h2573ce8_7/bin/bwa mem -k 5 -a output/{wildcards.genome}/{wildcards.genome}.fa \
+        output/output_{wildcards.genome}/reads/sim_transloc_reads{wildcards.name}.fa | /Users/morril01/software/samtools-1.13/samtools sort -o output/output_{wildcards.genome}/alignments/aligned_sim_transloc_reads{wildcards.name}.bam -; \
+        /Users/morril01/software/samtools-1.13/samtools index output/output_{wildcards.genome}/alignments/aligned_sim_transloc_reads{wildcards.name}.bam"
 
 rule segment:
     input:
-        "output/alignments/aligned_sim_transloc_reads{name}.bam"
+        "output/output_{genome}/alignments/aligned_sim_transloc_reads{name}.bam"
     output:
-        "output/plots_segmented/plotCN_{name}.pdf"
+        "output/output_{genome}/plots_segmented/plotCN_{name}.pdf"
     shell:
-        "Rscript 4_segment.R --name {wildcards.name}"
+        "mkdir -p output/output_{wildcards.genome}/plots_segmented/; Rscript 4_segment.R --name {wildcards.name} --genome {wildcards.genome}"
 

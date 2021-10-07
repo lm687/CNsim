@@ -9,16 +9,18 @@ library(optparse)
 library(QDNAseq)
 library(CNSimGenome)
 library(Biobase)
-
+source("4_helper_functions.R")
 if(local_bool){
   setwd(dirname(rstudioapi::getSourceEditorContext()$path))
   
   opt=list()
-  opt$name = "5df28185-3253-4dd7-b88f-320d4a5b87d0"
+  opt$name = "83bc8175-0b61-4844-98ee-f11f67716366"
 }else{
   option_list = list(
     make_option(c("--name"), type="character", default=NA,
-                help="name (uuid)", metavar="character"))
+                help="name (uuid)", metavar="character"),
+    make_option(c("--genome"), type="character", default=NA,
+                help="name of genome to use", metavar="character"))
   opt_parser = OptionParser(option_list=option_list);
   opt = parse_args(opt_parser);
   
@@ -29,8 +31,8 @@ if(local_bool){
 #                          nrec=-1L, skip=0L, seek.first.rec=FALSE,
 #                          use.names=TRUE, with.qualities=FALSE)
 
-bins_genome <- readRDS(file = "bins_genome02.RDS")
-readCounts <- QDNAseq::binReadCounts(bamfiles = paste0("output/alignments/aligned_sim_transloc_reads", opt$name, ".bam"),
+bins_genome <- readRDS(file = paste0("output/", opt$genome, "/bins_genome02.RDS"))
+readCounts <- QDNAseq::binReadCounts(bamfiles = paste0("output/output_",opt$genome, "/alignments/aligned_sim_transloc_reads", opt$name, ".bam"),
                                      bins = bins_genome)
 readCounts@assayData$counts ## none are aligned??
 sum(readCounts@assayData$counts)
@@ -45,7 +47,7 @@ readCountsFiltered <- readCounts
 readCountsFiltered@featureData@data$mappability=TRUE ## everything is mappable
 readCountsFiltered@featureData@data$use=TRUE ## everything is mappable
 readCountsFiltered@featureData@data$gc = rep(1, length(readCountsFiltered@featureData@data$gc))
-# readCountsFiltered <- estimateCorrection(readCountsFiltered)
+readCountsFiltered <- estimateCorrection(readCountsFiltered)
 copyNumbers <- correctBins(readCountsFiltered)
 copyNumbersNormalized <- normalizeBins(copyNumbers)
 copyNumbersSmooth <- smoothOutlierBins(copyNumbersNormalized)
@@ -86,69 +88,44 @@ data_for_plot$pos.1 = as.numeric(data_for_plot$pos.1)
 data_for_plot$pos.2 = as.numeric(data_for_plot$pos.2)
 
 ggplot(data_for_plot, aes(x=pos.1, xend=pos.2, y=cn, yend=cn))+geom_segment()+facet_wrap(.~chrom)+theme_bw()
-ggsave(paste0("output/plots_segmented/plotCN_", opt$name, ".pdf"))
+ggsave(paste0("output/output_", opt$genome, "/plots_segmented/plotCN_", opt$name, ".pdf"))
 
 ### From now, I use excerps from Phil's code (see qdnaseq_mod_ds.R)
 #bring back to readcount space 
 copyNumbers_old <- copyNumbers
 readCountsFiltered_old <- readCountsFiltered
 
-# library(Biobase)
-# assayDataElement(copyNumbers,"copynumber") <- assayDataElement(copyNumbers,"copynumber") * median(assayDataElement(readCountsFiltered, "fit"), na.rm=T)
-# 
+
+median(assayDataElement(readCountsFiltered, "fit"), na.rm=T)
+
+assayDataElement(copyNumbers,"copynumber")
+## need to go from relative to absolute CN. However, we are already in absolute CN, given that the purity is of 1?
+assayDataElement(copyNumbers,"copynumber") <- assayDataElement(copyNumbers,"copynumber") * median(assayDataElement(readCountsFiltered, "fit"), na.rm=T)
+
+copyNumbersSmooth <- mclapply(X=list(copyNumbers), FUN=smoothOutlierBins, mc.cores=1)
+copyNumbersSegmented <- mclapply(X=copyNumbersSmooth, FUN=segmentBins, transformFun="sqrt", mc.cores=1)
+
 # dim(assayDataElement(copyNumbers,"copynumber"))
-# median(assayDataElement(readCountsFiltered, "fit"), na.rm=T)
-# median(assayDataElement(copyNumbersCalled, "fit"), na.rm=T)
-# median(assayDataElement(copyNumbers, "fit"), na.rm=T)
-# 
-# ## copyNumbersSegmented
-# 
-# ## ?? where is this fit?
-# 
-# assayDataElement(copyNumbers,"copynumber")
-# median(assayDataElement(readCountsFiltered[[1]], "fit"), na.rm=T)
-# 
-# # ????
-#   
-# smooth_samples <- function(obj){
-#   # Index and subselect sample
-#   #ind <- which(colnames(copyNumbersSegmentedSmooth)==sample)
-#   relcn <- obj
-#   # Check if smoothing needed
-#   smooth.bool <- FALSE
-#   relative_tmp <- NULL
-#   if(sampleNames(obj) %in% smoothed_samples){
-#     smooth.bool <- TRUE
-#     currsamp <- relcn
-#     maxseg<-300
-#     sdadjust<-1.5
-#     condition <- fData(currsamp)$use
-#     segments <- assayDataElement(currsamp, "segmented")[condition, , drop=FALSE]
-#     segments<-apply(segments,2,rle)
-#     segnum<-as.numeric(lapply(segments,function(x){length(x$lengths)}))
-#     while(sum(segnum>maxseg)&sdadjust<5)
-#     {
-#       currsamp<-segmentBins(currsamp, transformFun="sqrt",undo.SD=sdadjust)
-#       segments <- assayDataElement(currsamp, "segmented")[condition, , drop=FALSE]
-#       segments<-apply(segments,2,rle)
-#       segnum<-as.numeric(lapply(segments,function(x){length(x$lengths)}))
-#       sdadjust<-sdadjust+0.5
-#     }
-#     relative_tmp <- currsamp
-#     relcn <- relative_tmp
-#   }
-#   return(relcn)
-# }
-# 
-# 
-# smoothed_samples <- sampleNames(copyNumbersSegmented)
-# copyNumbersSegmentedSmooth <- smooth_samples(copyNumbersSegmented)
-# 
-# depthtocn<-function(x,purity,seqdepth) #converts readdepth to copy number given purity and single copy depth
-# {
-#   (x/seqdepth-2*(1-purity))/purity
-# }
-# 
+
+
+##here 
+
+smoothed_samples <- sampleNames(copyNumbersSegmented)
+names(copyNumbersSegmented) <- smoothed_samples
+copyNumbersSegmentedSmooth <- smooth_samples(copyNumbersSegmented[[1]])
+
+View(copyNumbersSegmentedSmooth@assayData$segmented) ## these copy numbers look huge
+
+data_for_plot_abs <- cbind.data.frame(chrom=paste0('chr', gsub(":.*", "", rownames(copyNumbersSegmentedSmooth@assayData$segmented))),
+                                  pos=t(sapply(gsub("*:.", "", rownames(copyNumbersSegmentedSmooth@assayData$segmented)), function(i) strsplit(i, '-')[[1]])),
+                                  cn=copyNumbersSegmentedSmooth@assayData$segmented[,1])
+data_for_plot_abs$pos.1 = as.numeric(data_for_plot$pos.1)
+data_for_plot_abs$pos.2 = as.numeric(data_for_plot$pos.2)
+
+ggplot(data_for_plot_abs, aes(x=pos.1, xend=pos.2, y=cn, yend=cn))+geom_segment()+facet_wrap(.~chrom)+theme_bw()
+ggsave(paste0("output/output_", opt$genome, "/plots_segmented/plotabsCN_", opt$name, ".pdf"))
+
+
 # # List samples
 # qc.data <- read.table(copyNumbersSegmented@input[["meta"]],header = T,sep = "\t")
 # 

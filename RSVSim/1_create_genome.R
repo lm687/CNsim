@@ -40,11 +40,11 @@ seqlengths(CNSimGenome)
 
 bins_genome <- QDNAseq::createBins(CNSimGenome, binSize, ignoreMitochondria=TRUE, excludeSeqnames=NULL,
                     verbose=getOption("QDNAseq::verbose", TRUE))
-saveRDS(bins_genome, "bins_genome.RDS")
+saveRDS(bins_genome, "output/genome/bins_genome.RDS")
 
 bins_genome02 <- QDNAseq::createBins(CNSimGenome, 0.2, ignoreMitochondria=TRUE, excludeSeqnames=NULL,
                                      verbose=getOption("QDNAseq::verbose", TRUE))
-saveRDS(bins_genome02, "bins_genome02.RDS")
+saveRDS(bins_genome02, "output/genome/bins_genome02.RDS")
 
 
 forgeBSgenomeDataPkg("output/genome-seed.txt")

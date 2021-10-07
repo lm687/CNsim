@@ -61,8 +61,8 @@ At least in some cases (probably provided the number of estimated signatures is 
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=.49\textwidth]{/Users/morril01/Documents/PhD/CDA_in_Cancer/code/Nature_cnsigs/figures/simulation_nature_reject_signature_recovery_postnormalisation_ex1.pdf}
-\includegraphics[width=.49\textwidth]{/Users/morril01/Documents/PhD/CDA_in_Cancer/code/Nature_cnsigs/figures/simulation_nature_reject_signature_recovery_optimalk_postnormalisation_ex3.pdf}
+\includegraphics[width=.49\textwidth]{/Users/morril01/Documents/PhD/CDA_in_Cancer/code/Nature_cnsigs/simulation_from_reviewer/figures/simulation_nature_reject_signature_recovery_postnormalisation_ex1.pdf}
+\includegraphics[width=.49\textwidth]{/Users/morril01/Documents/PhD/CDA_in_Cancer/code/Nature_cnsigs/simulation_from_reviewer/figures/simulation_nature_reject_signature_recovery_optimalk_postnormalisation_ex3.pdf}
 \caption{Satisfactory signature recovery (left) and unsatisfactory signature recovery (right)\label{mysim}}
 \end{figure}
 
@@ -194,5 +194,46 @@ s6 & none\\
 \includegraphics[width=5in]{../intNMF/figures/correlation_several_sig_definitions_exposures_tanglegram.pdf}
 \caption{Tanglegram of the clustering of signature definitions and of exposures, for original and re-derived signatures\label{tanglegram}}
 \end{figure}
+
+\section{Simulation of derivative chromosomes for signature validation}
+\subsection{Software for CN simulation}
+\begin{itemize}
+\item SimSvGenomes (cpp programme): output sort of difficult to understand. It doesn't simulate genomes per se, rather, it outputs a bunch of segments. It doesn't simulate a single genome, but gives you the whole history (without explaining which genome comes from which). I gave up using it
+\item RSVSim: R package. What I am using right now. It creates deletions, insertions, etc. in a genome (either a true one or a simulated one)
+\item SECNVs: I haven't used it
+\item SCNVSim: I haven't used it
+\end{itemize}
+
+\clearpage
+\subsection{Pipeline for CN simulation}
+\begin{enumerate}
+\item Create genome. Create a \verb|BSGenome| R package with the genome
+\item Create derivative genome, given some exposures (although right now I am just using random changes in the genome), using \verb|RSVSim|.
+\begin{enumerate}
+\item Create reads from the derivative genome
+\end{enumerate}
+\item Align the reads to the genome using bwa
+\item Segment the genome using QDNASeq
+\item Call copy number signatures
+\end{enumerate}
+
+
+\textbf{20210927 current problem: the estimated copy number is huge. Problem with sequencing depth? because I am estimating it from the average number of reads per position}
+
+
+\section{My thoughts on the reviewers and rebuttal}
+
+\begin{itemize}
+\item \emph{However, their simulation suffers from a fatal design flaw and is not a valid representation of our approach. Given that reviewer 3’s harsh criticism was based on a flawed argument, we would like to discuss whether our manuscript could be reconsidered at Nature.} Despite the flaw in their simulation, the point they are making is valid. Also keep in mind - it's an example.
+\item It's true that as the number of within-patient observation decreases (e.g. if we had a feature which is genome-wide), we would encounter exactly the same situation that the reviewer refers to. We would have a single observation categorised in one of multiple components (multiple because we are pooling all observations from all samples when we are computing the sum of posteriors). Right now the feature with the least number of observations is the number of breakpoints per chromosome arm, where we have 44 observations per sample (if we have 22 autosomes; fewer if we have lost any). However, we also use a sum of posteriors, instead of the MAP, making it easier to have the signal spread (but not enforcing it).
+\item In Ruben's simulation, we can reconstruct the signatures where but that is because \textbf{we are using the correct number of signatures}. If we use more signatures (see my simulation, above) we have these badly-sparse signatures.
+\item (from markdown document) \emph{they encode the number of copy number events as an ordinal feature (categories with an order) not a count based feature} I don't see how that's true. They have categories, you have categories. I don't think the sentence above makes sense
+\begin{enumerate}
+\item The fact that the reviewer is using ordinal categories (which we are too!) does not affect anything
+\item \emph{However, none of the samples actually represent one of the three signatures as no sample has weights on both components of the number of CNAs feature as defined above.} We are missing the point - the point is that there is a single observation in the reviewer's simulation, because he is counting the number of CNAs in the sample!
+\item \emph{In our method we always use count based feature encodings and never categorical.} what does that mean
+\item \emph{In this case, we can keep the changepoint weights uniformly distributed across the features, however, as the breakpoints per chromosome arm feature has a finite space (only 44 autosome arms) in which to dribute the breaks, we cannot have a uniform distribution, but rather one which has stronger weight on the zero component.} why. What does that mean. You mean that the sum of posteriors in this feature is lower than the sum of posterior in the other feature, and hence that there is inherently in the method a lower weight in this feature (which is true)?
+\end{enumerate}
+\end{itemize}
 
 \end{document}

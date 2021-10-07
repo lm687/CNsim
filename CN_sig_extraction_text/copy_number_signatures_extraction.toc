@@ -13,3 +13,7 @@
 \contentsline {subsubsection}{\numberline {3.2.2}Comparison of signature definitions}{7}{subsubsection.3.2.2}% 
 \contentsline {paragraph}{Analysis per feature}{7}{section*.6}% 
 \contentsline {subsubsection}{\numberline {3.2.3}Conclusion}{9}{subsubsection.3.2.3}% 
+\contentsline {section}{\numberline {4}Simulation of derivative chromosomes for signature validation}{9}{section.4}% 
+\contentsline {subsection}{\numberline {4.1}Software for CN simulation}{9}{subsection.4.1}% 
+\contentsline {subsection}{\numberline {4.2}Pipeline for CN simulation}{10}{subsection.4.2}% 
+\contentsline {section}{\numberline {5}My thoughts on the reviewers and rebuttal}{10}{section.5}% 
