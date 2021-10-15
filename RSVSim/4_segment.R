@@ -9,12 +9,14 @@ library(optparse)
 library(QDNAseq)
 library(CNSimGenome)
 library(Biobase)
+library(ACE)
 source("4_helper_functions.R")
 if(local_bool){
   setwd(dirname(rstudioapi::getSourceEditorContext()$path))
   
   opt=list()
-  opt$name = "83bc8175-0b61-4844-98ee-f11f67716366"
+  opt$genome = "genome2"
+  opt$name = "84eff1f1-f243-4470-9993-98180e80f71e"
 }else{
   option_list = list(
     make_option(c("--name"), type="character", default=NA,
@@ -34,7 +36,7 @@ if(local_bool){
 bins_genome <- readRDS(file = paste0("output/", opt$genome, "/bins_genome02.RDS"))
 readCounts <- QDNAseq::binReadCounts(bamfiles = paste0("output/output_",opt$genome, "/alignments/aligned_sim_transloc_reads", opt$name, ".bam"),
                                      bins = bins_genome)
-readCounts@assayData$counts ## none are aligned??
+readCounts@assayData$counts ## how many are aligned
 sum(readCounts@assayData$counts)
 
 # readCounts <- QDNAseq::binReadCounts(bamfiles = "output/aligned_sim_transloc_reads_complement.bam", bins = bins_genome)
@@ -69,7 +71,15 @@ copyNumbersSegmented <- normalizeSegmentedBins(object = copyNumbersSegmented)
 rownames(copyNumbersSegmented@featureData@varMetadata)
 colnames(readCountsFiltered@featureData@data)
 
+
 copyNumbersCalled <- callBins(copyNumbersSegmented)
+
+original_derivative <- readRDS(paste0("output/output_", opt$genome, "/reads/", opt$name, "derivative_genome.RDS"))
+                               
+ACE::singleplot(template = copyNumbersCalled, QDNAseqobjectsample = 1, cellularity = 0.8)
+ACE::singleplot(template = copyNumbersCalled, QDNAseqobjectsample = 1, cellularity = 0.2)
+# 
+# readCounts@assayData$counts
 
 # QDNAseq::frequencyPlot(copyNumbersCalled)
 # # QDNAseq::isobarPlot(readCountsFiltered)
@@ -82,13 +92,19 @@ copyNumbersCalled <- callBins(copyNumbersSegmented)
 # plot(copyNumbersSegmented@assayData$copynumber, type='l')
 
 data_for_plot <- cbind.data.frame(chrom=paste0('chr', gsub(":.*", "", rownames(copyNumbersCalled@assayData$segmented))),
-                 pos=t(sapply(gsub("*:.", "", rownames(copyNumbersCalled@assayData$segmented)), function(i) strsplit(i, '-')[[1]])),
+                 pos=t(sapply(gsub("*.:", "", rownames(copyNumbersCalled@assayData$segmented)), function(i) strsplit(i, '-')[[1]])),
                  cn=copyNumbersCalled@assayData$segmented[,1])
 data_for_plot$pos.1 = as.numeric(data_for_plot$pos.1)
 data_for_plot$pos.2 = as.numeric(data_for_plot$pos.2)
 
-ggplot(data_for_plot, aes(x=pos.1, xend=pos.2, y=cn, yend=cn))+geom_segment()+facet_wrap(.~chrom)+theme_bw()
+ggplot(data_for_plot, aes(x=pos.1, xend=pos.2, y=cn, yend=cn))+geom_segment()+
+  facet_wrap(.~chrom, scales = "free_x")+theme_bw()
 ggsave(paste0("output/output_", opt$genome, "/plots_segmented/plotCN_", opt$name, ".pdf"))
+
+pdf(paste0("output/output_", opt$genome, "/plots_segmented/plotCN_", opt$name, "_ACE08cellularity.pdf"))
+ACE::singleplot(template = copyNumbersCalled, QDNAseqobjectsample = 1, cellularity = 0.8,
+                title = paste0(original_derivative@metadata$deletions[1:4], collapse = "-"))
+dev.off()
 
 ### From now, I use excerps from Phil's code (see qdnaseq_mod_ds.R)
 #bring back to readcount space 
@@ -114,7 +130,7 @@ smoothed_samples <- sampleNames(copyNumbersSegmented)
 names(copyNumbersSegmented) <- smoothed_samples
 copyNumbersSegmentedSmooth <- smooth_samples(copyNumbersSegmented[[1]])
 
-View(copyNumbersSegmentedSmooth@assayData$segmented) ## these copy numbers look huge
+# View(copyNumbersSegmentedSmooth@assayData$segmented) ## these copy numbers look huge
 
 data_for_plot_abs <- cbind.data.frame(chrom=paste0('chr', gsub(":.*", "", rownames(copyNumbersSegmentedSmooth@assayData$segmented))),
                                   pos=t(sapply(gsub("*:.", "", rownames(copyNumbersSegmentedSmooth@assayData$segmented)), function(i) strsplit(i, '-')[[1]])),
@@ -131,16 +147,16 @@ ggsave(paste0("output/output_", opt$genome, "/plots_segmented/plotabsCN_", opt$n
 # 
 # samples <- qc.data
 # 
-# cn <- assayDataElement(copyNumbersCalled,"copynumber")
-# seg <- assayDataElement(copyNumbersCalled,"segmented")
+cn <- assayDataElement(copyNumbersCalled,"copynumber")
+seg <- assayDataElement(copyNumbersCalled,"segmented")
 # 
 # # Convert to abs
-# length_bins <- sapply(gsub("*.:", "", rownames(readCounts@assayData$counts)), function(i){.x <- (strsplit(i, '-')[[1]]); as.numeric(.x[2])-as.numeric(.x[1])})
-# average_depth <- mean(length_bins*readCounts@assayData$counts[,1])
-# 
-# abs_cn <- depthtocn(cn,purity = 1,seqdepth = average_depth)
-# abs_seg <- depthtocn(seg,purity = 1,seqdepth = average_depth)
-# 
+length_bins <- sapply(gsub("*.:", "", rownames(readCounts@assayData$counts)), function(i){.x <- (strsplit(i, '-')[[1]]); as.numeric(.x[2])-as.numeric(.x[1])})
+average_depth <- sum(length_bins/(sum(length_bins))*readCounts@assayData$counts[,1])
+
+abs_cn <- depthtocn(cn,purity = 0.8,seqdepth = average_depth)
+abs_seg <- depthtocn(seg,purity = 0.8,seqdepth = average_depth)
+
 # copyNumbersCalled_for_sigs <- copyNumbersCalled
 # assayDataElement(copyNumbersCalled_for_sigs,"copynumber") <- abs_cn
 # assayDataElement(copyNumbersCalled_for_sigs,"segmented") <- abs_seg

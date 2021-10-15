@@ -236,4 +236,28 @@ s6 & none\\
 \end{enumerate}
 \end{itemize}
 
+\clearpage
+
+\section{Simulating genomes - 20211014}
+\begin{enumerate}
+\item the reads are not uniform. currently simulating many reads to see if it's simply a problem of number of reads. With more reads it's better, but still not perfect uniform coverage at all.
+\item even with many reads, and with a single deletion of 1000bp, there is no way of noticing a difference in the reads
+\item Now, manually, removing the first 1kb of a chromosome (both chromosomes). From inspecting the bam files, it looks fine.
+\begin{enumerate}
+\item reducing the number of reads gives a reconstruction which is really not as good
+\end{enumerate}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=3in]{/Users/morril01/Desktop/plots_segmented_common_deletion/plotCN_362c82d8-6739-4fa0-81d1-f8399f947270_ACE08cellularity.pdf}
+\caption{Notice the first part of chrom 1 in which there is a deletion of both alleles}
+\end{figure}
+
+%/Users/morril01/Documents/PhD/CDA_in_Cancer/code/Nature_cnsigs/RSVSim/output/output_genome2/plots_segmented/plotCN_362c82d8-6739-4fa0-81d1-f8399f947270_ACE08cellularity.pdf
+
+
+
+\end{enumerate}
+
+
 \end{document}

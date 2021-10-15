@@ -16,7 +16,7 @@ rule create_genome:
         "output/output_{genome}/reads/sim_transloc_reads{name}.fa"
     shell:
         # "Rscript 2_create_derivative_genome.R --name {wildcards.name} --genome {{genome}}"
-        "mkdir -p output/output_{wildcards.genome}/reads/; mkdir -p output/output_{wildcards.genome}/reads/; Rscript 2_create_derivative_genome.R --name {wildcards.name} --genome {wildcards.genome}"
+        "mkdir -p output/output_{wildcards.genome}/reads/; mkdir -p output/output_{wildcards.genome}/reads/; Rscript 2_create_derivative_genome.R --name {wildcards.name} --genome {wildcards.genome} --size_deletion 1000"
 
 rule align_bwa:
     input:
