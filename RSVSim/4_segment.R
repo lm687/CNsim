@@ -7,7 +7,7 @@ if(local_bool){
 library(ggplot2)
 library(optparse)
 library(QDNAseq)
-library(CNSimGenome)
+# library(CNSimGenome)
 library(Biobase)
 library(ACE)
 source("4_helper_functions.R")
@@ -17,6 +17,7 @@ if(local_bool){
   opt=list()
   opt$genome = "genome2"
   opt$name = "84eff1f1-f243-4470-9993-98180e80f71e"
+  opt$name = "1f041abe-1a08-4b39-bab4-168614961fe6"
 }else{
   option_list = list(
     make_option(c("--name"), type="character", default=NA,
@@ -101,9 +102,16 @@ ggplot(data_for_plot, aes(x=pos.1, xend=pos.2, y=cn, yend=cn))+geom_segment()+
   facet_wrap(.~chrom, scales = "free_x")+theme_bw()
 ggsave(paste0("output/output_", opt$genome, "/plots_segmented/plotCN_", opt$name, ".pdf"))
 
+## add information about simulation
+details_sim <- readRDS(paste0("output/output_", opt$genome, "/reads/", opt$name, "derivative_genome.RDS"))
+
+title_plot_lengths_chrom <- paste0(apply(sapply(1:(length(details_sim)/2), function(chrom_idx) sapply(details_sim[c(chrom_idx, chrom_idx+(length(details_sim)/2))], length)),
+      2, paste0, collapse=';'), collapse = " ")
+
 pdf(paste0("output/output_", opt$genome, "/plots_segmented/plotCN_", opt$name, "_ACE08cellularity.pdf"))
 ACE::singleplot(template = copyNumbersCalled, QDNAseqobjectsample = 1, cellularity = 0.8,
-                title = paste0(original_derivative@metadata$deletions[1:4], collapse = "-"))
+                # title = paste0(original_derivative@metadata$deletions[1:4], collapse = "-"),
+                title=title_plot_lengths_chrom)
 dev.off()
 
 ### From now, I use excerps from Phil's code (see qdnaseq_mod_ds.R)

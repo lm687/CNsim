@@ -3,6 +3,15 @@ import os
 a = [x for x in os.listdir("exposures") if x != '.DS_Store']
 # print(a)
 
+## /Users/morril01/anaconda3/pkgs/bwa-0.7.17-h2573ce8_7/bin/bwa index
+## /Users/morril01/software/samtools-1.13/samtools
+
+bwa_folder = "/Users/morril01/software/"
+samtools_folder = "/Users/morril01/software/samtools-1.13/"
+
+bwa_command = "/Users/morril01/software/bwa/.bwa "
+samtools_command = "/Users/morril01/software/samtools-1.13/samtools"
+
 rule all:
     input:
       # expand("output/output_{genome}/reads/sim_transloc_reads{name}.fa", name=a[0], genome = "genome2")
@@ -24,9 +33,9 @@ rule align_bwa:
     output:
         "output/output_{genome}/alignments/aligned_sim_transloc_reads{name}.bam"
     shell:
-        "/Users/morril01/anaconda3/pkgs/bwa-0.7.17-h2573ce8_7/bin/bwa index output/{wildcards.genome}/{wildcards.genome}.fa; mkdir -p output/output_{wildcards.genome}/alignments/; /Users/morril01/anaconda3/pkgs/bwa-0.7.17-h2573ce8_7/bin/bwa mem -k 5 -a output/{wildcards.genome}/{wildcards.genome}.fa \
-        output/output_{wildcards.genome}/reads/sim_transloc_reads{wildcards.name}.fa | /Users/morril01/software/samtools-1.13/samtools sort -o output/output_{wildcards.genome}/alignments/aligned_sim_transloc_reads{wildcards.name}.bam -; \
-        /Users/morril01/software/samtools-1.13/samtools index output/output_{wildcards.genome}/alignments/aligned_sim_transloc_reads{wildcards.name}.bam"
+        "{wildcards.bwa_command} index output/{wildcards.genome}/{wildcards.genome}.fa; mkdir -p output/output_{wildcards.genome}/alignments/; {wildcards.bwa_command} mem -k 5 -a output/{wildcards.genome}/{wildcards.genome}.fa \
+        output/output_{wildcards.genome}/reads/sim_transloc_reads{wildcards.name}.fa | {wildcards.samtools_command} sort -o output/output_{wildcards.genome}/alignments/aligned_sim_transloc_reads{wildcards.name}.bam -; \
+        {wildcards.samtools_command} index output/output_{wildcards.genome}/alignments/aligned_sim_transloc_reads{wildcards.name}.bam"
 
 rule segment:
     input:

@@ -16,5 +16,5 @@ release_date: 2021
 source_url: none
 biocViews: AnnotationData, Genetics, BSgenome, none
 NeedsCompilation: no
-Packaged: 2021-09-27 14:50:50 UTC; morril01
-Built: R 4.0.3; ; 2021-09-27 14:50:56 UTC; unix
+Packaged: 2021-10-15 09:27:13 UTC; morril01
+Built: R 4.0.3; ; 2021-10-15 09:27:32 UTC; unix

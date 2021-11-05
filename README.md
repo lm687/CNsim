@@ -8,6 +8,10 @@ Locally, I am using the snakemake environment
 source activate snakemake-globalDA
 ```
 
+on HPC
+source activate snakemake-CNsim
+
+
 Conda env:
 
 Created using
