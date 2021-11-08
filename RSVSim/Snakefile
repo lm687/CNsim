@@ -3,36 +3,54 @@ import os
 a = [x for x in os.listdir("exposures") if x != '.DS_Store']
 # print(a)
 
+a = a[:10]
+
+## local
+bwaindex = "/Users/morril01/anaconda3/pkgs/bwa-0.7.17-h2573ce8_7/bin/bwa index"
+bwamem = "/Users/morril01/anaconda3/pkgs/bwa-0.7.17-h2573ce8_7/bin/bwa mem"
+samtools_sort = "/Users/morril01/software/samtools-1.13/samtools sort"
+samtools_index = "/Users/morril01/software/samtools-1.13/samtools index"
+
+## HPC
+bwaindex = "/home/lm687/software/bwa/bwa index"
+bwamem = "/home/lm687/software/bwa/bwa mem"
+samtools_sort = "/home/lm687/software/samtools-1.13/samtools sort"
+samtools_index = "/home/lm687/software/samtools-1.13/samtools index"
+
+
 rule all:
     input:
       # expand("output/output_{genome}/reads/sim_transloc_reads{name}.fa", name=a[0], genome = "genome2")
       # expand("output/output_{genome}/alignments/aligned_sim_transloc_reads{name}.bam", name=a[0], genome = "genome2")
-      expand("output/output_{genome}/plots_segmented/plotCN_{name}.pdf", name=a, genome = "genome2")
+      expand("output/output_{genome}/plots_segmented/plotCN_{name}_nreads{nreads}_sizedels{size_deletion}_ACE08cellularity.pdf", name=a, nreads = [8000, 12000], size_deletion = [1000, 500, 200], genome = "genome2")
 
 rule create_genome:
     input:
         "exposures/{name}"
     output:
-        "output/output_{genome}/reads/sim_transloc_reads{name}.fa"
+        "output/output_{genome}/reads/sim_transloc_reads{name}_nreads{nreads}_sizedels{size_deletion}.fa"
     shell:
         # "Rscript 2_create_derivative_genome.R --name {wildcards.name} --genome {{genome}}"
-        "mkdir -p output/output_{wildcards.genome}/reads/; mkdir -p output/output_{wildcards.genome}/reads/; Rscript 2_create_derivative_genome.R --name {wildcards.name} --genome {wildcards.genome} --size_deletion 1000"
+        "mkdir -p output/output_{wildcards.genome}/reads/; mkdir -p output/output_{wildcards.genome}/characteristics_sim/; mkdir -p output/output_{wildcards.genome}/reads/; Rscript 2_create_derivative_genome.R --name {wildcards.name} --genome {wildcards.genome} --size_deletion {wildcards.size_deletion} --nreads {wildcards.nreads}"
+
+
+## {bwaindex} output/{wildcards.genome}/{wildcards.genome}.fa; only needs to be done once
 
 rule align_bwa:
     input:
-        "output/output_{genome}/reads/sim_transloc_reads{name}.fa"
+        "output/output_{genome}/reads/sim_transloc_reads{name}_nreads{nreads}_sizedels{size_deletion}.fa"
     output:
-        "output/output_{genome}/alignments/aligned_sim_transloc_reads{name}.bam"
+        "output/output_{genome}/alignments/aligned_sim_transloc_reads{name}_nreads{nreads}_sizedels{size_deletion}.bam"
     shell:
-        "/Users/morril01/anaconda3/pkgs/bwa-0.7.17-h2573ce8_7/bin/bwa index output/{wildcards.genome}/{wildcards.genome}.fa; mkdir -p output/output_{wildcards.genome}/alignments/; /Users/morril01/anaconda3/pkgs/bwa-0.7.17-h2573ce8_7/bin/bwa mem -k 5 -a output/{wildcards.genome}/{wildcards.genome}.fa \
-        output/output_{wildcards.genome}/reads/sim_transloc_reads{wildcards.name}.fa | /Users/morril01/software/samtools-1.13/samtools sort -o output/output_{wildcards.genome}/alignments/aligned_sim_transloc_reads{wildcards.name}.bam -; \
-        /Users/morril01/software/samtools-1.13/samtools index output/output_{wildcards.genome}/alignments/aligned_sim_transloc_reads{wildcards.name}.bam"
+        "mkdir -p output/output_{wildcards.genome}/alignments/; {bwamem} -k 5 -a output/{wildcards.genome}/{wildcards.genome}.fa \
+        output/output_{wildcards.genome}/reads/sim_transloc_reads{wildcards.name}_nreads{wildcards.nreads}_sizedels{wildcards.size_deletion}.fa | {samtools_sort} -o output/output_{wildcards.genome}/alignments/aligned_sim_transloc_reads{wildcards.name}_nreads{wildcards.nreads}_sizedels{wildcards.size_deletion}.bam -; \
+        {samtools_index} output/output_{wildcards.genome}/alignments/aligned_sim_transloc_reads{wildcards.name}_nreads{wildcards.nreads}_sizedels{wildcards.size_deletion}.bam"
 
 rule segment:
     input:
-        "output/output_{genome}/alignments/aligned_sim_transloc_reads{name}.bam"
+        "output/output_{genome}/alignments/aligned_sim_transloc_reads{name}_nreads{nreads}_sizedels{size_deletion}.bam"
     output:
-        "output/output_{genome}/plots_segmented/plotCN_{name}.pdf"
+        "output/output_{genome}/plots_segmented/plotCN_{name}_nreads{nreads}_sizedels{size_deletion}_ACE08cellularity.pdf"
     shell:
-        "mkdir -p output/output_{wildcards.genome}/plots_segmented/; Rscript 4_segment.R --name {wildcards.name} --genome {wildcards.genome}"
+        "mkdir -p output/output_{wildcards.genome}/plots_segmented/; Rscript 4_segment.R --name {wildcards.name} --genome {wildcards.genome} --size_deletion {wildcards.size_deletion} --nreads {wildcards.nreads}"
 

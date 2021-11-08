@@ -7,7 +7,7 @@ if(local_bool){
 library(ggplot2)
 library(optparse)
 library(QDNAseq)
-library(CNSimGenome)
+#library(CNSimGenome)
 library(Biobase)
 library(ACE)
 source("4_helper_functions.R")
@@ -21,6 +21,12 @@ if(local_bool){
   option_list = list(
     make_option(c("--name"), type="character", default=NA,
                 help="name (uuid)", metavar="character"),
+    make_option(c("--size_deletion"), type="double", default=200,
+                help="size of the deletion, in bp",
+                metavar="double"),
+    make_option(c("--nreads"), type="double", default=4000,
+                help="number of reads",
+                metavar="double"),
     make_option(c("--genome"), type="character", default=NA,
                 help="name of genome to use", metavar="character"))
   opt_parser = OptionParser(option_list=option_list);
@@ -33,8 +39,8 @@ if(local_bool){
 #                          nrec=-1L, skip=0L, seek.first.rec=FALSE,
 #                          use.names=TRUE, with.qualities=FALSE)
 
-bins_genome <- readRDS(file = paste0("output/", opt$genome, "/bins_genome02.RDS"))
-readCounts <- QDNAseq::binReadCounts(bamfiles = paste0("output/output_",opt$genome, "/alignments/aligned_sim_transloc_reads", opt$name, ".bam"),
+bins_genome <- readRDS(file = paste0("output/", opt$genome, "/bins_genome0002.RDS"))
+readCounts <- QDNAseq::binReadCounts(bamfiles = paste0("output/output_",opt$genome, "/alignments/aligned_sim_transloc_reads", opt$name, '_nreads', opt$nreads, '_sizedels', opt$size_deletion, ".bam"),
                                      bins = bins_genome)
 readCounts@assayData$counts ## how many are aligned
 sum(readCounts@assayData$counts)
@@ -97,11 +103,11 @@ data_for_plot <- cbind.data.frame(chrom=paste0('chr', gsub(":.*", "", rownames(c
 data_for_plot$pos.1 = as.numeric(data_for_plot$pos.1)
 data_for_plot$pos.2 = as.numeric(data_for_plot$pos.2)
 
-ggplot(data_for_plot, aes(x=pos.1, xend=pos.2, y=cn, yend=cn))+geom_segment()+
-  facet_wrap(.~chrom, scales = "free_x")+theme_bw()
-ggsave(paste0("output/output_", opt$genome, "/plots_segmented/plotCN_", opt$name, ".pdf"))
+#ggplot(data_for_plot, aes(x=pos.1, xend=pos.2, y=cn, yend=cn))+geom_segment()+
+#  facet_wrap(.~chrom, scales = "free_x")+theme_bw()
+#ggsave(paste0("output/output_", opt$genome, "/plots_segmented/plotCN_", opt$name, ".pdf"))
 
-pdf(paste0("output/output_", opt$genome, "/plots_segmented/plotCN_", opt$name, "_ACE08cellularity.pdf"))
+pdf(paste0("output/output_", opt$genome, "/plots_segmented/plotCN_", opt$name, '_nreads', opt$nreads, '_sizedels', opt$size_deletion, '_ACE08cellularity.pdf'))
 ACE::singleplot(template = copyNumbersCalled, QDNAseqobjectsample = 1, cellularity = 0.8,
                 title = paste0(original_derivative@metadata$deletions[1:4], collapse = "-"))
 dev.off()
@@ -138,8 +144,8 @@ data_for_plot_abs <- cbind.data.frame(chrom=paste0('chr', gsub(":.*", "", rownam
 data_for_plot_abs$pos.1 = as.numeric(data_for_plot$pos.1)
 data_for_plot_abs$pos.2 = as.numeric(data_for_plot$pos.2)
 
-ggplot(data_for_plot_abs, aes(x=pos.1, xend=pos.2, y=cn, yend=cn))+geom_segment()+facet_wrap(.~chrom)+theme_bw()
-ggsave(paste0("output/output_", opt$genome, "/plots_segmented/plotabsCN_", opt$name, ".pdf"))
+#ggplot(data_for_plot_abs, aes(x=pos.1, xend=pos.2, y=cn, yend=cn))+geom_segment()+facet_wrap(.~chrom)+theme_bw()
+#ggsave(paste0("output/output_", opt$genome, "/plots_segmented/plotabsCN_", opt$name, ".pdf"))
 
 
 # # List samples

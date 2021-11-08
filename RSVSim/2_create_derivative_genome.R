@@ -29,6 +29,12 @@ if(local){
                 metavar="double"),
     make_option(c("--nreads"), type="double", default=4000,
                 help="number of reads",
+                metavar="double"),
+    make_option(c("--ndels"), type="double", default=1,
+                help="number of deletions simulated with RSVsim",
+                metavar="double"),
+    make_option(c("--readlen"), type="double", default=150,
+                help="length of simulated read",
                 metavar="double"))
   opt_parser = OptionParser(option_list=option_list);
   opt = parse_args(opt_parser);
@@ -62,7 +68,7 @@ names(genome) <- paste0(names(genome), rep(c('a', 'b'), each=length(genome)/2))
 # sim_del = simulateSV(output=NA, genome=genome, dels=1, sizeDels=opt$size_deletion,
 #                      verbose=FALSE)
 
-sim_del = simulateSV(output=NA, genome=genome, dels=1, sizeDels=opt$size_deletion,
+sim_del = simulateSV(output=NA, genome=genome, dels=opt$ndels, sizeDels=opt$size_deletion,
                      verbose=FALSE)
 
 # sim_del <- genome
@@ -72,6 +78,7 @@ sim_del = simulateSV(output=NA, genome=genome, dels=1, sizeDels=opt$size_deletio
 sim_to_save_BS <- sim_del
 sim_to_save <- DNAStringSet(sim_to_save_BS)
 saveRDS(sim_to_save_BS, paste0("output/output_", opt$genome, "/reads/", opt$name, "derivative_genome.RDS"))
+saveRDS(opt, paste0("output/output_", opt$genome, "/characteristics_sim/", opt$name, "_arguments.RDS"))
 
 # for(j in 1:20){
 #   .sim_del = simulateSV(output=NA, genome=sim_del, dels=1, sizeDels=opt$size_deletion,
@@ -126,7 +133,7 @@ saveRDS(sim_to_save_BS, paste0("output/output_", opt$genome, "/reads/", opt$name
 sim_to_save
 
 nreads=opt$nreads
-length_read = 150
+length_read = opt$readlen
 lengths_chroms <- sapply(sim_to_save, nchar)
 lengths_chroms_norm <- lengths_chroms/sum(lengths_chroms)
 
@@ -174,6 +181,8 @@ system(paste0('mkdir -p output/output_', opt$genome))
 system(paste0('mkdir -p output/output_', opt$genome, '/reads/'))
 
 writeXStringSet(x = reads_c, filepath = paste0("output/output_", opt$genome, "/reads/sim_transloc_reads",
-                                               opt$name, ".fa"))
+                                               opt$name, '_nreads', opt$nreads, '_sizedels', opt$size_deletion, ".fa"))
+
+
 # writeXStringSet(x = complement(reads_c), filepath = "output/sim_transloc_reads_complement.fa")
 
