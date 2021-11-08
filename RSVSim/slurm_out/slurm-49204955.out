@@ -1,0 +1,24 @@
+Building DAG of jobs...
+Using shell: /usr/bin/bash
+Provided cores: 1 (use --cores to define parallelism)
+Rules claiming more threads will be scaled down.
+Select jobs to execute...
+
+[Mon Nov  8 10:16:14 2021]
+rule align_bwa:
+    input: output/output_genome2/reads/sim_transloc_reads1f041abe-1a08-4b39-bab4-168614961fe6_nreads8000_sizedels10.fa
+    output: output/output_genome2/alignments/aligned_sim_transloc_reads1f041abe-1a08-4b39-bab4-168614961fe6_nreads8000_sizedels10.bam
+    jobid: 0
+    wildcards: genome=genome2, name=1f041abe-1a08-4b39-bab4-168614961fe6, nreads=8000, size_deletion=10
+    resources: mem_mb=1000, disk_mb=1000, tmpdir=/tmp
+
+mkdir -p output/output_genome2/alignments/; /home/lm687/software/bwa/bwa mem -k 5 -a output/genome2/genome2.fa         output/output_genome2/reads/sim_transloc_reads1f041abe-1a08-4b39-bab4-168614961fe6_nreads8000_sizedels10.fa | /home/lm687/software/samtools-1.13/samtools sort -o output/output_genome2/alignments/aligned_sim_transloc_reads1f041abe-1a08-4b39-bab4-168614961fe6_nreads8000_sizedels10.bam -;         /home/lm687/software/samtools-1.13/samtools index output/output_genome2/alignments/aligned_sim_transloc_reads1f041abe-1a08-4b39-bab4-168614961fe6_nreads8000_sizedels10.bam
+[M::bwa_idx_load_from_disk] read 0 ALT contigs
+[M::process] read 8000 sequences (1166992 bp)...
+[M::mem_process_seqs] Processed 8000 reads in 15.278 CPU sec, 15.316 real sec
+[main] Version: 0.7.17-r1198-dirty
+[main] CMD: /home/lm687/software/bwa/bwa mem -k 5 -a output/genome2/genome2.fa output/output_genome2/reads/sim_transloc_reads1f041abe-1a08-4b39-bab4-168614961fe6_nreads8000_sizedels10.fa
+[main] Real time: 15.345 sec; CPU: 15.299 sec
+[Mon Nov  8 10:16:30 2021]
+Finished job 0.
+1 of 1 steps (100%) done

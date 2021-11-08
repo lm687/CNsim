@@ -1,0 +1,319 @@
+Building DAG of jobs...
+Using shell: /usr/bin/bash
+Provided cores: 1 (use --cores to define parallelism)
+Rules claiming more threads will be scaled down.
+Select jobs to execute...
+
+[Fri Oct 29 12:00:18 2021]
+rule segment:
+    input: output/output_genome2/alignments/aligned_sim_transloc_readsffac781d-60f0-4119-b50e-641cb192eb3a_nreads12000_sizedels1000.bam
+    output: output/output_genome2/plots_segmented/plotCN_ffac781d-60f0-4119-b50e-641cb192eb3a_nreads12000_sizedels1000_ACE08cellularity.pdf
+    jobid: 0
+    wildcards: genome=genome2, name=ffac781d-60f0-4119-b50e-641cb192eb3a, nreads=12000, size_deletion=1000
+    resources: mem_mb=1000, disk_mb=1000, tmpdir=/tmp
+
+mkdir -p output/output_genome2/plots_segmented/; Rscript 4_segment.R --name ffac781d-60f0-4119-b50e-641cb192eb3a --genome genome2 --size_deletion 1000 --nreads 12000
+Loading required package: BiocGenerics
+Loading required package: parallel
+
+Attaching package: ‘BiocGenerics’
+
+The following objects are masked from ‘package:parallel’:
+
+    clusterApply, clusterApplyLB, clusterCall, clusterEvalQ,
+    clusterExport, clusterMap, parApply, parCapply, parLapply,
+    parLapplyLB, parRapply, parSapply, parSapplyLB
+
+The following objects are masked from ‘package:stats’:
+
+    IQR, mad, sd, var, xtabs
+
+The following objects are masked from ‘package:base’:
+
+    anyDuplicated, append, as.data.frame, basename, cbind, colnames,
+    dirname, do.call, duplicated, eval, evalq, Filter, Find, get, grep,
+    grepl, intersect, is.unsorted, lapply, Map, mapply, match, mget,
+    order, paste, pmax, pmax.int, pmin, pmin.int, Position, rank,
+    rbind, Reduce, rownames, sapply, setdiff, sort, table, tapply,
+    union, unique, unsplit, which.max, which.min
+
+Welcome to Bioconductor
+
+    Vignettes contain introductory material; view with
+    'browseVignettes()'. To cite Bioconductor, see
+    'citation("Biobase")', and for packages 'citation("pkgname")'.
+
+    aligned_sim_transloc_readsffac781d-60f0-4119-b50e-641cb192eb3a_nreads12000_sizedels1000 (1 of 1): extracting reads ... binning ...
+            aligned_sim_transloc_readsffac781d-60f0-4119-b50e-641cb192eb3a_nreads12000_sizedels1000
+1:1-200                                                                                          85
+1:201-400                                                                                        59
+1:401-600                                                                                        55
+1:601-800                                                                                        59
+1:801-1000                                                                                       57
+1:1001-1200                                                                                      59
+1:1201-1400                                                                                      51
+1:1401-1600                                                                                      57
+1:1601-1800                                                                                      67
+1:1801-2000                                                                                      54
+1:2001-2200                                                                                      55
+1:2201-2400                                                                                      53
+1:2401-2600                                                                                      57
+1:2601-2800                                                                                      63
+1:2801-3000                                                                                      61
+1:3001-3200                                                                                      54
+1:3201-3400                                                                                      60
+1:3401-3600                                                                                      68
+1:3601-3800                                                                                      67
+1:3801-4000                                                                                      72
+1:4001-4200                                                                                      66
+1:4201-4400                                                                                      69
+1:4401-4600                                                                                      63
+1:4601-4800                                                                                      55
+1:4801-5000                                                                                      58
+1:5001-5200                                                                                      70
+1:5201-5400                                                                                      60
+1:5401-5600                                                                                      59
+1:5601-5800                                                                                      73
+1:5801-6000                                                                                      58
+1:6001-6200                                                                                      49
+1:6201-6400                                                                                      68
+1:6401-6600                                                                                      86
+1:6601-6800                                                                                      58
+1:6801-7000                                                                                      57
+2:1-200                                                                                         102
+2:201-400                                                                                        68
+2:401-600                                                                                        61
+2:601-800                                                                                        58
+2:801-1000                                                                                       58
+2:1001-1200                                                                                      61
+2:1201-1400                                                                                      64
+2:1401-1600                                                                                      64
+2:1601-1800                                                                                      64
+2:1801-2000                                                                                      53
+2:2001-2200                                                                                      66
+2:2201-2400                                                                                      53
+2:2401-2600                                                                                      67
+2:2601-2800                                                                                      62
+2:2801-3000                                                                                      55
+2:3001-3200                                                                                      59
+2:3201-3400                                                                                      53
+2:3401-3600                                                                                      55
+2:3601-3800                                                                                      61
+2:3801-4000                                                                                      60
+2:4001-4200                                                                                      70
+2:4201-4400                                                                                      68
+2:4401-4600                                                                                      54
+2:4601-4800                                                                                      70
+2:4801-5000                                                                                      61
+2:5001-5200                                                                                      55
+2:5201-5400                                                                                      64
+2:5401-5600                                                                                      76
+2:5601-5800                                                                                      54
+2:5801-6000                                                                                      49
+3:1-200                                                                                         104
+3:201-400                                                                                        57
+3:401-600                                                                                        52
+3:601-800                                                                                        72
+3:801-1000                                                                                       47
+3:1001-1200                                                                                      55
+3:1201-1400                                                                                      59
+3:1401-1600                                                                                      35
+3:1601-1800                                                                                      30
+3:1801-2000                                                                                      33
+3:2001-2200                                                                                      35
+3:2201-2400                                                                                      54
+3:2401-2600                                                                                      57
+3:2601-2800                                                                                      54
+3:2801-3000                                                                                      57
+3:3001-3200                                                                                      56
+3:3201-3400                                                                                      57
+3:3401-3600                                                                                      59
+3:3601-3800                                                                                      60
+3:3801-4000                                                                                      72
+3:4001-4200                                                                                      76
+3:4201-4400                                                                                      63
+3:4401-4500                                                                                      35
+4:1-200                                                                                         101
+4:201-400                                                                                        72
+4:401-600                                                                                        51
+4:601-800                                                                                        47
+4:801-1000                                                                                       51
+4:1001-1200                                                                                      70
+4:1201-1400                                                                                      63
+4:1401-1600                                                                                      52
+4:1601-1800                                                                                      60
+4:1801-2000                                                                                      66
+[1] 5939
+Calculating correction for GC content and mappability
+    Calculating fit for sample aligned_sim_transloc_readsffac781d-60f0-4119-b50e-641cb192eb3a_nreads12000_sizedels1000 (1 of 1) ...
+Done.
+Applying median normalization ...
+Smoothing outliers ...
+Performing segmentation:
+NA
+[1] "chromosome" "start"      "end"        "bases"      "gc"        
+[6] "6"          "7"         
+[1] "chromosome"  "start"       "end"         "bases"       "gc"         
+[6] "mappability" "use"        
+[1] "chromosome"  "start"       "end"         "bases"       "gc"         
+[6] "mappability" "use"        
+[1] "chromosome"  "start"       "end"         "bases"       "gc"         
+[6] "mappability" "use"        
+EM algorithm started ... 
+
+[1] "Total number of segments present in the data: 4"
+[1] "Number of segments used for fitting the model: 4"
+40974076926265218.952.9817098014786712436.4112.981709809194168436.470.2
+Calling iteration1:
+
+optim results
+time: 0
+minimum: 49.3417879486379
+148.8679750027632-0.678154493895621-0.160992015633472-0.008643562258336440.2837917402618180.4851451843698570.9620907382605110.090008589345634-1.17609649318237e-050.01118034199783951.37284050996528e-050.06711714213638360.153168832394661
+4098912692968621952.9817098014786712436.4112.981709809194168436.470.2
+Calling iteration2:
+
+optim results
+time: 0
+minimum: 49.3948821957646
+148.8673569043621-0.681381434124778-0.159954525942766-0.009282326117836840.2692156643222990.4602272179676530.9299730094077070.010463113836112-1.86849665238944e-050.011180351915135-2.67521524136705e-050.1204212815288650.236806486665585
+EM algorithm done ...
+
+Computing posterior probabilities for all segments ...
+
+Total time:0minutes
+
+Adjusting segmented data for cellularity ... 
+
+Cellularity sample1: 1
+
+Adjusting normalized data for cellularity ... 
+
+Cellularity sample1: 1
+
+1
+41015176935348219.153817098014786712436.4112.981709809194168436.470.2
+41015366935849219.153817098014786712436.4112.981709809194168436.470.2
+41015336935843219.153817098014786712436.4112.981709809194168436.470.2
+41015616936631219.153817098014786712436.4112.981709809194168436.470.2
+41019886937586219.153817098014786712436.4112.981709809194168436.470.2
+41019976937590219.153817098014786712436.4112.981709809194168436.470.2
+41020066937594219.153817098014786712436.4112.981709809194168436.470.2
+41020156937598219.153817098014786712436.4112.981709809194168436.470.2
+41020246937602219.153817098014786712436.4112.981709809194168436.470.2
+41020306937605219.153817098014786712436.4112.981709809194168436.470.2
+41020496937837219.153817098014786712436.4112.981709809194168436.470.2
+41024656938160219.153817098014786712436.4112.981709809194168436.470.2
+FINISHED!
+
+Total time:0minutes
+
+There were 24 warnings (use warnings() to see them)
+pdf 
+  2 
+[1] 1
+            aligned_sim_transloc_readsffac781d-60f0-4119-b50e-641cb192eb3a_nreads12000_sizedels1000
+1:1-200                                                                                          85
+1:201-400                                                                                        59
+1:401-600                                                                                        55
+1:601-800                                                                                        59
+1:801-1000                                                                                       57
+1:1001-1200                                                                                      59
+1:1201-1400                                                                                      51
+1:1401-1600                                                                                      57
+1:1601-1800                                                                                      67
+1:1801-2000                                                                                      54
+1:2001-2200                                                                                      55
+1:2201-2400                                                                                      53
+1:2401-2600                                                                                      57
+1:2601-2800                                                                                      63
+1:2801-3000                                                                                      61
+1:3001-3200                                                                                      54
+1:3201-3400                                                                                      60
+1:3401-3600                                                                                      68
+1:3601-3800                                                                                      67
+1:3801-4000                                                                                      72
+1:4001-4200                                                                                      66
+1:4201-4400                                                                                      69
+1:4401-4600                                                                                      63
+1:4601-4800                                                                                      55
+1:4801-5000                                                                                      58
+1:5001-5200                                                                                      70
+1:5201-5400                                                                                      60
+1:5401-5600                                                                                      59
+1:5601-5800                                                                                      73
+1:5801-6000                                                                                      58
+1:6001-6200                                                                                      49
+1:6201-6400                                                                                      68
+1:6401-6600                                                                                      86
+1:6601-6800                                                                                      58
+1:6801-7000                                                                                      57
+2:1-200                                                                                         102
+2:201-400                                                                                        68
+2:401-600                                                                                        61
+2:601-800                                                                                        58
+2:801-1000                                                                                       58
+2:1001-1200                                                                                      61
+2:1201-1400                                                                                      64
+2:1401-1600                                                                                      64
+2:1601-1800                                                                                      64
+2:1801-2000                                                                                      53
+2:2001-2200                                                                                      66
+2:2201-2400                                                                                      53
+2:2401-2600                                                                                      67
+2:2601-2800                                                                                      62
+2:2801-3000                                                                                      55
+2:3001-3200                                                                                      59
+2:3201-3400                                                                                      53
+2:3401-3600                                                                                      55
+2:3601-3800                                                                                      61
+2:3801-4000                                                                                      60
+2:4001-4200                                                                                      70
+2:4201-4400                                                                                      68
+2:4401-4600                                                                                      54
+2:4601-4800                                                                                      70
+2:4801-5000                                                                                      61
+2:5001-5200                                                                                      55
+2:5201-5400                                                                                      64
+2:5401-5600                                                                                      76
+2:5601-5800                                                                                      54
+2:5801-6000                                                                                      49
+3:1-200                                                                                         104
+3:201-400                                                                                        57
+3:401-600                                                                                        52
+3:601-800                                                                                        72
+3:801-1000                                                                                       47
+3:1001-1200                                                                                      55
+3:1201-1400                                                                                      59
+3:1401-1600                                                                                      35
+3:1601-1800                                                                                      30
+3:1801-2000                                                                                      33
+3:2001-2200                                                                                      35
+3:2201-2400                                                                                      54
+3:2401-2600                                                                                      57
+3:2601-2800                                                                                      54
+3:2801-3000                                                                                      57
+3:3001-3200                                                                                      56
+3:3201-3400                                                                                      57
+3:3401-3600                                                                                      59
+3:3601-3800                                                                                      60
+3:3801-4000                                                                                      72
+3:4001-4200                                                                                      76
+3:4201-4400                                                                                      63
+3:4401-4500                                                                                      70
+4:1-200                                                                                         101
+4:201-400                                                                                        72
+4:401-600                                                                                        51
+4:601-800                                                                                        47
+4:801-1000                                                                                       51
+4:1001-1200                                                                                      70
+4:1201-1400                                                                                      63
+4:1401-1600                                                                                      52
+4:1601-1800                                                                                      60
+4:1801-2000                                                                                      66
+Smoothing outliers ...
+Performing segmentation:
+NA
+[Fri Oct 29 12:00:38 2021]
+Finished job 0.
+1 of 1 steps (100%) done

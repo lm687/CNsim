@@ -1,0 +1,16 @@
+#!/bin/sh
+#SBATCH --job-name=snakegeneral
+#SBATCH --out=slurm_out/general_snake_slurm.or
+#SBATCH --cpus-per-task=1
+#SBATCH --mem=10KB
+#SBATCH -p skylake
+#SBATCH -A MARKOWETZ-SL3-CPU
+#SBATCH --time=02:00:00
+#SBATCH --mail-user=lena.morrill@cruk.cam.ac.uk
+
+module load miniconda3-4.5.4-gcc-5.4.0-hivczbz
+source activate snakemake-cnsigs
+snakemake --cluster "sbatch -A MARKOWETZ-SL3-CPU -t 0:10:00 -p skylake --cores 1  --output=slurm_out/slurm-%j.out " --jobs 40 --printshellcmds
+conda deactivate
+
+
