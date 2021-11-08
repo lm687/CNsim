@@ -1,0 +1,4 @@
+scp output/genome2/bins_genome0002.RDS lm687@login-cpu.hpc.cam.ac.uk:/home/lm687/CNsim/RSVSim/output/genome2/bins_genome0002.RDS
+
+
+
