@@ -122,14 +122,18 @@ ACE::singleplot(template = copyNumbersCalled, QDNAseqobjectsample = 1, cellulari
                 title=title_plot_lengths_chrom)
 dev.off()
 
+cat('Plotting coverage\n')
+
 pdf(paste0("output/output_", opt$genome, "/plots_segmented/plotCN_", opt$name, '_nreads', opt$nreads, '_sizedels', opt$size_deletion, '_coverage.pdf'))
 QDNAseq::plot(readCounts)
 dev.off()
 
+cat('Plotting logratios 1/2\n')
 pdf(paste0("output/output_", opt$genome, "/plots_segmented/plotCN_", opt$name, '_nreads', opt$nreads, '_sizedels', opt$size_deletion, '_logRatio1.pdf'))
-plot(copyNumbersSegmented$`aligned_sim_transloc_reads1f041abe-1a08-4b39-bab4-168614961fe6`)
+plot(copyNumbersSegmented)
 dev.off()
 
+cat('Plotting logratios 2/2\n')
 pdf(paste0("output/output_", opt$genome, "/plots_segmented/plotCN_", opt$name, '_nreads', opt$nreads, '_sizedels', opt$size_deletion, '_logRatio2.pdf'))
 plot(copyNumbersCalled)
 dev.off()

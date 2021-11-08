@@ -22,7 +22,7 @@ rule all:
     input:
       # expand("output/output_{genome}/reads/sim_transloc_reads{name}.fa", name=a[0], genome = "genome2")
       # expand("output/output_{genome}/alignments/aligned_sim_transloc_reads{name}.bam", name=a[0], genome = "genome2")
-      expand("output/output_{genome}/plots_segmented/plotCN_{name}_nreads{nreads}_sizedels{size_deletion}_ACE08cellularity.pdf", name=a, nreads = [8000], size_deletion = [1], genome = "genome2")
+      expand("output/output_{genome}/plots_segmented/plotCN_{name}_nreads{nreads}_sizedels{size_deletion}_ACE08cellularity.pdf", name=a, nreads = [800], size_deletion = [1], genome = "genome2")
 
 rule create_genome:
     input:
