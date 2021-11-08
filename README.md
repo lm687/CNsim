@@ -2,22 +2,22 @@
 
 Simulations of derivative chromosomes for copy number signature validation
 
-
-Locally, I am using the snakemake environment
+- Locally, I am using the snakemake environment
 ```
 source activate snakemake-globalDA
 ```
 
-on HPC
-source activate snakemake-CNsim
+- On HPC
+```
+source activate snakemake-cnsigs
+#source activate snakemake-CNsim ## I don't know what this is
+```
 
-
-Conda env:
-
-Created using
+This conda env was created using
 ```
 conda create -n snakemake-cnsigs -c conda-forge bioconda::snakemake bioconda::snakemake-minimal -c bioconda
 ```
+and all appropriate R packages were downloaded afterwards
 
 
 ```
