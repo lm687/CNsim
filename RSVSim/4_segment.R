@@ -127,7 +127,7 @@ details_sim <- readRDS(paste0("output/output_", opt$genome, "/reads/", opt$name,
 title_plot_lengths_chrom <- paste0(apply(sapply(1:(length(details_sim)/2), function(chrom_idx) sapply(details_sim[c(chrom_idx, chrom_idx+(length(details_sim)/2))], length)),
       2, paste0, collapse=';'), collapse = " ")
 
-pdf(paste0("output/output_", opt$genome, "/plots_segmented/plotCN_", opt$name, '_nreads', opt$nreads, '_sizedels', opt$size_deletion, '_ACE08cellularity.pdf'))
+pdf(paste0("output/output_", opt$genome, "/plots_segmented/plotCN_", opt$name, '_nreads', opt$nreads, '_sizedels', opt$size_deletion, '_binsize', opt$size_bin, '_ACE08cellularity.pdf'))
 ACE::singleplot(template = copyNumbersCalled, QDNAseqobjectsample = 1, cellularity = 0.8,
                 # title = paste0(original_derivative@metadata$deletions[1:4], collapse = "-"),
                 title=title_plot_lengths_chrom)
@@ -135,17 +135,17 @@ dev.off()
 
 cat('Plotting coverage\n')
 
-pdf(paste0("output/output_", opt$genome, "/plots_segmented/plotCN_", opt$name, '_nreads', opt$nreads, '_sizedels', opt$size_deletion, '_coverage.pdf'))
+pdf(paste0("output/output_", opt$genome, "/plots_segmented/plotCN_", opt$name, '_nreads', opt$nreads, '_sizedels', opt$size_deletion, '_binsize', opt$size_bin, '_coverage.pdf'))
 QDNAseq::plot(readCounts)
 dev.off()
 
 cat('Plotting logratios 1/2\n')
-pdf(paste0("output/output_", opt$genome, "/plots_segmented/plotCN_", opt$name, '_nreads', opt$nreads, '_sizedels', opt$size_deletion, '_logRatio1.pdf'))
+pdf(paste0("output/output_", opt$genome, "/plots_segmented/plotCN_", opt$name, '_nreads', opt$nreads, '_sizedels', opt$size_deletion, '_binsize', opt$size_bin,  '_logRatio1.pdf'))
 plot(copyNumbersSegmented)
 dev.off()
 
 cat('Plotting logratios 2/2\n')
-pdf(paste0("output/output_", opt$genome, "/plots_segmented/plotCN_", opt$name, '_nreads', opt$nreads, '_sizedels', opt$size_deletion, '_logRatio2.pdf'))
+pdf(paste0("output/output_", opt$genome, "/plots_segmented/plotCN_", opt$name, '_nreads', opt$nreads, '_sizedels', opt$size_deletion, '_binsize', opt$size_bin,  '_logRatio2.pdf'))
 plot(copyNumbersCalled)
 dev.off()
 
