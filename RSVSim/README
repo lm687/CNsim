@@ -1,12 +1,24 @@
 I use the snakemake environment source activate snakemake-globalDA
 
+######################################
+# from local to HPC
 
+## exposures
 rsync -r exposures/ lm687@login-cpu.hpc.cam.ac.uk:/home/lm687/CNsim/RSVSim/exposures
 
+## genomes
 rsync -r output/genome2/ lm687@login-cpu.hpc.cam.ac.uk:/home/lm687/CNsim/RSVSim/output/genome2/
 
+## genome package
 rsync -r CNSimGenome2/ lm687@login-cpu.hpc.cam.ac.uk:/home/lm687/CNsim/RSVSim/CNSimGenome2/
+######################################
 
-Check ../README.md for commands to run snake pipeline
+######################################
+# from HPC to local
 
+## output plots
+rsync -a lm687@login-cpu.hpc.cam.ac.uk:/home/lm687/CNsim/RSVSim/output/output_genome2/plots_segmented/ output/output_genome2/plots_segmented/ 
+
+## characteristics of simulation
+rsync -a lm687@login-cpu.hpc.cam.ac.uk:/home/lm687/CNsim/RSVSim/output/output_genome2/characteristics_sim/ output/output_genome2/characteristics_sim/ 
 
