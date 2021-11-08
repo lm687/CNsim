@@ -122,6 +122,10 @@ ACE::singleplot(template = copyNumbersCalled, QDNAseqobjectsample = 1, cellulari
                 title=title_plot_lengths_chrom)
 dev.off()
 
+pdf(paste0("output/output_", opt$genome, "/plots_segmented/plotCN_", opt$name, '_nreads', opt$nreads, '_sizedels', opt$size_deletion, '_coverage.pdf'))
+QDNAseq::plot(readCounts)
+dev.off()
+
 ### From now, I use excerps from Phil's code (see qdnaseq_mod_ds.R)
 #bring back to readcount space 
 copyNumbers_old <- copyNumbers
