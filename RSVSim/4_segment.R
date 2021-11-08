@@ -127,7 +127,7 @@ QDNAseq::plot(readCounts)
 dev.off()
 
 pdf(paste0("output/output_", opt$genome, "/plots_segmented/plotCN_", opt$name, '_nreads', opt$nreads, '_sizedels', opt$size_deletion, '_logRatio1.pdf'))
-plot(copyNumbersSegmented$`aligned_sim_transloc_reads1f041abe-1a08-4b39-bab4-168614961fe6`)
+plot(copyNumbersSegmented)
 dev.off()
 
 pdf(paste0("output/output_", opt$genome, "/plots_segmented/plotCN_", opt$name, '_nreads', opt$nreads, '_sizedels', opt$size_deletion, '_logRatio2.pdf'))
