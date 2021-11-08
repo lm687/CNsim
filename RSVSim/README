@@ -19,6 +19,10 @@ rsync -r CNSimGenome2/ lm687@login-cpu.hpc.cam.ac.uk:/home/lm687/CNsim/RSVSim/CN
 ## output plots
 rsync -a lm687@login-cpu.hpc.cam.ac.uk:/home/lm687/CNsim/RSVSim/output/output_genome2/plots_segmented/ output/output_genome2/plots_segmented/ 
 
+rsync -a lm687@login-cpu.hpc.cam.ac.uk:/home/lm687/CNsim/RSVSim/output/output_genome2/reads/*RDS output/output_genome2/reads/
+
+rsync -a lm687@login-cpu.hpc.cam.ac.uk:/home/lm687/CNsim/RSVSim/output/output_genome2/alignments/*bam output/output_genome2/alignments/
+
 ## characteristics of simulation
 rsync -a lm687@login-cpu.hpc.cam.ac.uk:/home/lm687/CNsim/RSVSim/output/output_genome2/characteristics_sim/ output/output_genome2/characteristics_sim/ 
 

@@ -17,11 +17,17 @@ if(local_bool){
   opt=list()
   opt$genome = "genome2"
   opt$name = "84eff1f1-f243-4470-9993-98180e80f71e"
-  opt$name = "1f041abe-1a08-4b39-bab4-168614961fe6"
+  opt$name = "1f041abe-1a08-4b39-bab4-168614961fe6" ### nice pattern, when  opt$nreads and opt$size_deletion is NULL
+  opt$nreads <- 8000
+  opt$size_deletion <- 1
+  opt$name = "028f3fe8-2a89-4492-bab5-760584a664a5"
 }else{
   option_list = list(
     make_option(c("--name"), type="character", default=NA,
                 help="name (uuid)", metavar="character"),
+    make_option(c("--size_bin"), type="double", default='02',
+                help="size of bin for CN extraction",
+                metavar="character"),
     make_option(c("--size_deletion"), type="double", default=200,
                 help="size of the deletion, in bp",
                 metavar="double"),
@@ -40,7 +46,13 @@ if(local_bool){
 #                          nrec=-1L, skip=0L, seek.first.rec=FALSE,
 #                          use.names=TRUE, with.qualities=FALSE)
 
-bins_genome <- readRDS(file = paste0("output/", opt$genome, "/bins_genome0002.RDS"))
+if(opt$size_bin == "02"){
+  bins_genome <- readRDS(file = paste0("output/", opt$genome, "/bins_genome02.RDS"))
+}else if(opt$size_bin == "0002"){
+  bins_genome <- readRDS(file = paste0("output/", opt$genome, "/bins_genome0002.RDS"))
+}else{
+  stop('Specify a correct <size_bin>')
+}
 readCounts <- QDNAseq::binReadCounts(bamfiles = paste0("output/output_",opt$genome, "/alignments/aligned_sim_transloc_reads", opt$name, '_nreads', opt$nreads, '_sizedels', opt$size_deletion, ".bam"),
                                      bins = bins_genome)
 readCounts@assayData$counts ## how many are aligned
@@ -86,7 +98,7 @@ original_derivative_RSV <- readRDS(paste0("output/output_", opt$genome, "/reads/
 
 ACE::singleplot(template = copyNumbersCalled, QDNAseqobjectsample = 1, cellularity = 0.8)
 ACE::singleplot(template = copyNumbersCalled, QDNAseqobjectsample = 1, cellularity = 0.2)
-# 
+
 # readCounts@assayData$counts
 
 # QDNAseq::frequencyPlot(copyNumbersCalled)
@@ -116,7 +128,6 @@ title_plot_lengths_chrom <- paste0(apply(sapply(1:(length(details_sim)/2), funct
       2, paste0, collapse=';'), collapse = " ")
 
 pdf(paste0("output/output_", opt$genome, "/plots_segmented/plotCN_", opt$name, '_nreads', opt$nreads, '_sizedels', opt$size_deletion, '_ACE08cellularity.pdf'))
-
 ACE::singleplot(template = copyNumbersCalled, QDNAseqobjectsample = 1, cellularity = 0.8,
                 # title = paste0(original_derivative@metadata$deletions[1:4], collapse = "-"),
                 title=title_plot_lengths_chrom)
