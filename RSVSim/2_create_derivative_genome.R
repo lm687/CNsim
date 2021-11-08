@@ -69,9 +69,11 @@ sim_del = simulateSV(output=NA, genome=genome, dels=1, sizeDels=opt$size_deletio
 # sim_del[1] <-   Biostrings::substr(sim_del[1], 2000, nchar(sim_del[1]))
 # sim_del[5] <-   Biostrings::substr(sim_del[1], 2000, nchar(sim_del[1]))
 
-sim_to_save_BS <- sim_del
-sim_to_save <- DNAStringSet(sim_to_save_BS)
-saveRDS(sim_to_save_BS, paste0("output/output_", opt$genome, "/reads/", opt$name, "derivative_genome.RDS"))
+sim_to_save0 <- sim_del
+sim_to_save <- DNAStringSet(sim_del)
+
+saveRDS(sim_to_save, paste0("output/output_", opt$genome, "/reads/", opt$name, "derivative_genome.RDS"))
+saveRDS(sim_to_save0, paste0("output/output_", opt$genome, "/reads/", opt$name, "derivative_genome_RSVSim.RDS"))
 
 # for(j in 1:20){
 #   .sim_del = simulateSV(output=NA, genome=sim_del, dels=1, sizeDels=opt$size_deletion,

@@ -7,6 +7,7 @@ if(local_bool){
 library(ggplot2)
 library(optparse)
 library(QDNAseq)
+library(RSVSim)
 # library(CNSimGenome)
 library(Biobase)
 library(ACE)
@@ -76,7 +77,8 @@ colnames(readCountsFiltered@featureData@data)
 copyNumbersCalled <- callBins(copyNumbersSegmented)
 
 original_derivative <- readRDS(paste0("output/output_", opt$genome, "/reads/", opt$name, "derivative_genome.RDS"))
-                               
+original_derivative_RSV <- readRDS(paste0("output/output_", opt$genome, "/reads/", opt$name, "derivative_genome_RSVSim.RDS"))
+
 ACE::singleplot(template = copyNumbersCalled, QDNAseqobjectsample = 1, cellularity = 0.8)
 ACE::singleplot(template = copyNumbersCalled, QDNAseqobjectsample = 1, cellularity = 0.2)
 # 
