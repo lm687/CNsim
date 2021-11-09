@@ -9,6 +9,8 @@ rsync -r exposures/ lm687@login-cpu.hpc.cam.ac.uk:/home/lm687/CNsim/RSVSim/expos
 ## genomes
 rsync -r output/genome2/ lm687@login-cpu.hpc.cam.ac.uk:/home/lm687/CNsim/RSVSim/output/genome2/
 
+rsync output/genome2/bins_genome002.RDS lm687@login-cpu.hpc.cam.ac.uk:/home/lm687/CNsim/RSVSim/output/genome2/bins_genome002.RDS
+
 ## genome package
 rsync -r CNSimGenome2/ lm687@login-cpu.hpc.cam.ac.uk:/home/lm687/CNsim/RSVSim/CNSimGenome2/
 ######################################

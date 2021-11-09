@@ -14,6 +14,7 @@ if(local){
   opt$purity= 0.8
   opt$size_deletion = 200
   opt$nreads = 9000
+  opt$ndels <- 1
   system("touch exposures/dummyname")
 }else{
   option_list = list(
@@ -71,6 +72,127 @@ names(genome) <- paste0(names(genome), rep(c('a', 'b'), each=length(genome)/2))
 sim_del = simulateSV(output=NA, genome=genome, dels=opt$ndels, sizeDels=opt$size_deletion,
                      verbose=FALSE)
 
+fiddle_with_genome <- F
+if(fiddle_with_genome){
+  sim_mod = simulateSV(output=NA, genome=genome, dels=opt$ndels, sizeDels=opt$size_deletion,
+                       verbose=FALSE)
+  
+  sim_mod@metadata$deletions
+  genome_changing <- genome
+  sim_mod@metadata$deletions$Start:sim_mod@metadata$deletions$End
+  chrom_in_change <- strsplit(as.character(genome_changing[sim_mod@metadata$deletions$Chr]), '')[[1]]
+  chrom_in_change[sim_mod@metadata$deletions$Start:sim_mod@metadata$deletions$End] <- '-'
+  genome_changing[[sim_mod@metadata$deletions$Chr]] <- BString(paste0(chrom_in_change, collapse = ""))
+  
+  many_changes <- simulateSV(dels = 10, ins = 20, dups = 20, genome = genome, output = NA, sizeDels = 500, sizeDups = 300)
+  
+  ## initialise
+  genome_changing <- genome
+  
+  ## Add "-" in nucleotides of deletions
+  for(i_del in 1:nrow(many_changes@metadata$deletions)){
+    chrom_in_change <- strsplit(as.character(genome_changing[[many_changes@metadata$deletions$Chr[i_del]]]), '')[[1]]
+    chrom_in_change[many_changes@metadata$deletions$Start[i_del]:many_changes@metadata$deletions$End[i_del]] <- '-'
+    genome_changing[[many_changes@metadata$deletions$Chr[i_del]]] <- BString(paste0(chrom_in_change, collapse = ""))
+  }
+  for(i_dup in 1:nrow(many_changes@metadata$tandemDuplications)){
+      ## need to sort how insertions work    
+      chrom_in_change <- strsplit(as.character(genome_changing[[many_changes@metadata$tandemDuplications$Chr[i_ins]]]), '')[[1]]
+      chrom_in_change[1:many_changes@metadata$tandemDuplications$Start[i_ins]] <- '-'
+      chrom_in_change[many_changes@metadata$tandemDuplications$End[i_ins]:width(genome_changing[many_changes@metadata$tandemDuplications$Chr[i_ins]])] <- '-'
+      chrom_in_change <- BString(paste0(chrom_in_change, collapse = ""))
+      for(i_td_dups in 1:many_changes@metadata$tandemDuplications$Duplications[i_ins]){
+        ## many tandem duplications
+        genome_changing[[paste0(many_changes@metadata$tandemDuplications$Chr[i_ins], '_', i_ins, '_', i_td_dups)]] <- chrom_in_change
+      }
+    }
+  ## Create "additional chromosomes" of inserted regions
+  # for(i_ins in 1:nrow(many_changes@metadata$insertions)){
+  #   ## need to sort how insertions work    
+  #   chrom_in_change <- strsplit(as.character(genome_changing[[many_changes@metadata$insertions$Chr[i_ins]]]), '')[[1]]
+  #   chrom_in_change[1:many_changes@metadata$insertions$Start[i_ins]] <- '-'
+  #   chrom_in_change[many_changes@metadata$insertions$End[i_ins]:width(genome_changing[many_changes@metadata$insertions$Chr[i_ins]])] <- '-'
+  #   chrom_in_change <- BString(paste0(chrom_in_change, collapse = ""))
+  #   genome_changing[[paste0(many_changes@metadata$insertions$Chr[i_ins], '_', i_ins)]] <- chrom_in_change
+  #   
+  # }
+  ## insertion vs duplication?????
+  
+  ## now select the chromosomes that are homologous
+  chroms_final <- sapply(names(genome_changing), function(i) strsplit(i, '[a-z]')[[1]][1])
+  chroms_final_idx <- sapply(unique(chroms_final), function(i) which(chroms_final == i))
+  
+
+  true_ploidies_sim <- lapply(1:length(chroms_final_idx), function(idx_chroms_final){
+    splt_chrom_it <- sapply(genome_changing[chroms_final_idx[[idx_chroms_final]]], function(i) strsplit(as.character(i), '')[[1]])
+    original_genome <- strsplit(as.character(genome[names(chroms_final[chroms_final_idx[[idx_chroms_final]]][1])]), '')[[1]]
+    splt_chrom_it_match <- apply(splt_chrom_it, 2, function(i) i==original_genome)
+    true_ploidy <- rowSums(splt_chrom_it_match)
+    true_ploidy
+  })
+  plot(unlist(true_ploidies_sim),
+       col=c('red', 'blue', 'green', 'orange')[factor(rep(1:length(true_ploidies_sim), sapply(true_ploidies_sim, length)))])
+  
+  true_ploidies_sim_df <- lapply(1:length(true_ploidies_sim), function(i) cbind.data.frame(cn=true_ploidies_sim[[i]],
+                                                                   position=1:length(true_ploidies_sim[[i]])))
+  names(true_ploidies_sim_df) <- names(chroms_final_idx)
+  ggplot(melt(true_ploidies_sim_df, id.vars=c('cn', 'position')), aes(x=position, xend=position+1, y=cn, yend=cn))+
+    # geom_segment()+facet_wrap(.~L1, scales = "free_x")+theme_bw()
+  geom_step()+facet_wrap(.~L1, scales = "free_x")+theme_bw()
+  
+  ## repeat this with all chromosomes
+  
+  ## add additional mutations, but incorporating the changes into
+  sim_mod2 = simulateSV(output=NA, genome=sim_mod, 
+                        verbose=FALSE, ins = 2)
+  sim_mod2@metadata$deletions
+  sim_mod2@metadata$insertions
+  
+  library(RSVSim)
+  
+
+  many_changes@metadata$deletions
+  many_changes@metadata$insertions
+  RSVSim::compareSV(genome, many_changes)
+  bins_genome <- readRDS(file = paste0("output/", opt$genome, "/bins_genome02.RDS"))
+  
+  Biostrings::coverage(many_changes)
+  
+  ## align each derivetive chromosome to the chromosome from which it comes, to get the ploidy
+  ## not sure about inversions
+  ## let's not simulate inversions for now
+  length_read <- 5
+  give_reads_string <- function(arg_genome, arg_lengths_chroms_norm){
+    arg_genome_split <- strsplit(arg_genome, '')[[1]]
+    arg_lengths_chroms <- length(arg_genome_split)
+    .start <- sample((1-length_read):(arg_lengths_chroms-1), size = 1)
+    .start
+    paste0(arg_genome_split[max(.start, 1):min(arg_lengths_chroms,
+                                        .start+(length_read-1))], collapse = "")
+    # 
+    # .read
+  }
+  
+  as.character(many_changes[1])
+  reads_sim <- replicate(100, give_reads_string(as.character(sim_del[1])))
+  as.character(genome[1])
+  
+  globalAlign<- pairwiseAlignment(pattern = reads_sim, subject = as.character(genome[1]), type="local")
+  globalAlign@pattern@unaligned
+  globalAlign@pattern@unaligned
+  globalAlign
+  
+  library(msa)
+  msa_res <- msa(c(true=as.character(genome[[1]]), reads_sim), type = "dna")
+  msa_res@params
+  msa_res
+  msa_res@unmasked
+  msa_res@unmasked
+  View(msa(c(true=as.character(genome[[1]]), reads_sim), method="ClustalOmega", type = "dna"))
+  
+  grepl(reads_sim[[1]], as.character(genome[[1]]))
+}
+  
 # sim_del <- genome
 # sim_del[1] <-   Biostrings::substr(sim_del[1], 2000, nchar(sim_del[1]))
 # sim_del[5] <-   Biostrings::substr(sim_del[1], 2000, nchar(sim_del[1]))

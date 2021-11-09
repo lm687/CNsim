@@ -54,6 +54,10 @@ bins_genome02 <- QDNAseq::createBins(CNSimGenome2, 0.2, ignoreMitochondria=TRUE,
                                      verbose=getOption("QDNAseq::verbose", TRUE))
 saveRDS(bins_genome02, "output/genome2/bins_genome02.RDS")
 
+bins_genome02 <- QDNAseq::createBins(CNSimGenome2, 0.02, ignoreMitochondria=TRUE, excludeSeqnames=NULL,
+                                     verbose=getOption("QDNAseq::verbose", TRUE))
+saveRDS(bins_genome02, "output/genome2/bins_genome002.RDS")
+
 bins_genome02 <- QDNAseq::createBins(CNSimGenome2, 0.002, ignoreMitochondria=TRUE, excludeSeqnames=NULL,
                                      verbose=getOption("QDNAseq::verbose", TRUE))
 saveRDS(bins_genome02, "output/genome2/bins_genome0002.RDS")
