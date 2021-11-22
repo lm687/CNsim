@@ -1,5 +1,34 @@
-rm(list = ls())
-setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+
+library(optparse)
+
+local=T
+
+if(local){
+  
+  rm(list = ls())
+  setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+  
+  opt <- list()
+  opt$sigset <- 'sigset1'
+  
+}else{
+  
+  option_list = list(
+    make_option(c("--input_list"), type="character", default=NA,
+                help="Text with small description of the type of simulation being carried out", metavar="character"),
+    make_option(c("--sigset"), type="character", default=NA,
+                help="set of signatures that we are using", metavar="character"),
+    make_option(c("--genome"), type="character", default=NA,
+                help="name of genome to use", metavar="character"));
+  opt_parser = OptionParser(option_list=option_list);
+  opt = parse_args(opt_parser);
+}
+
+
+sigset <- opt$sigset
+
+system(paste0("mkdir -p ", sigset))
+
 source("2_helper_functions.R")
 source("../../../../other_repos/britroc-cnsignatures-bfb69cd72c50/main_functions.R")
 source("../../../../other_repos/britroc-cnsignatures-bfb69cd72c50/helper_functions.R")
@@ -12,15 +41,13 @@ library(ggplot2)
 library(flexmix)
 library(NMF)
 
-sigset <- 'sigset1'
-a <- list.files("output/output_genome2/outputRSVSim/sigset1/", full.names = T)
-exposures <- list.files("exposures/sigset1/", full.names = T)
+a <- list.files(paste0("output/output_genome2/outputRSVSim/", opt$sigset, "/"), full.names = T)
+exposures <- list.files(paste0("exposures/", opt$sigset, "/"), full.names = T)
 exposures_read <- sapply(exposures, read.table)
-a_read <- lapply(a, readRDS)
+a_read <- lapply(opt$input_list, readRDS)
 
 # a_read <- a_read[match(basename(exposures), gsub(".RDS", "", basename(a)))]
 exposures <- exposures[match(gsub(".RDS", "", basename(a)), basename(exposures))]
-
 
 exposures_read
 
@@ -33,8 +60,12 @@ hist(first_sig)
 
 a_read
 
+if(opt$genome == "genome2"){
+  name_genome <- "output/genome2/genome2.fa"
+}else{
+  stop('Change genome\n')
+}
 
-name_genome <- "output/genome2/genome2.fa"
 genome <- readBStringSet(name_genome, format="fasta",
                          nrec=-1L, skip=0L, seek.first.rec=FALSE,
                          use.names=TRUE, with.qualities=FALSE)
@@ -42,8 +73,8 @@ genome <- rep(genome, 2)
 names(genome) <- paste0(names(genome), rep(c('a', 'b'), each=length(genome)/2))
 
 par(mfrow=c(1,1))
-system("mkdir -p output/output_genome2/outputRSVSim/figures/")
-pdf(paste0("output/output_genome2/outputRSVSim/figures/", sigset, "_profiles.pdf"), height = 3, width = 5)
+system(paste0("mkdir -p output/output_", opt$genome, "/outputRSVSim/figures/"))
+pdf(paste0("output/output_", opt$genome, "/outputRSVSim/figures/", sigset, "_profiles.pdf"), height = 3, width = 5)
 for(j in 1:length(a_read)){
   # plot_from_hash(a_read[j], main=j)
   # sapply(a_read[j], plot_from_hash, main=j)
@@ -136,8 +167,10 @@ table(features$changepoint$value) ## good
 
 fmm <- fitMixtureModels_mod(features)
 # fmm <- fitMixtureModels(features, featsToFit = c(1, 2, 5))
+saveRDS(fmm, paste0(sigset, "/sigextraction_fmm", ".RDS"))
 
 lMats <- generateSampleByComponentMatrix_mod(CN_feature = features, all_components = fmm, feats=names(fmm))
+saveRDS(lMats, paste0(sigset, "/sigextraction_SxC", ".RDS"))
 
 ## need to find optimal number of signatures
 
@@ -151,6 +184,8 @@ best_coph <- function(opt_res){
 best_nsig <- best_coph(sigs_optimalk)
 
 sigs <- generateSignatures_mod(lMats, nsig = best_nsig, nrun=2)
+saveRDS(sigs, paste0(sigset, "/sigextraction_optimalk_allfeats", ".RDS"))
+
 image(sigs@consensus)
 exposures_est <- coefficients(sigs)
 signaturedef <- basis(sigs)
@@ -163,10 +198,10 @@ image(exposures_est)
 data_cor_est_true <- cbind.data.frame(estimated_exposures=t(exposures_est),
                  true_exposures=do.call('rbind', exposures_read))
 
-pairs(data_cor_est_true,
-      # col=c(rep('blue', 3*ncol(exposures_est)/6), rep('red', 3*length(exposures_read)/6)))
-      col=rep(c('blue', 'red'), each=c(best_nsig*ncol(exposures_est)/6),  3*length(exposures_read)/6)
-)
+# pairs(data_cor_est_true,
+#       # col=c(rep('blue', 3*ncol(exposures_est)/6), rep('red', 3*length(exposures_read)/6)))
+#       col=rep(c('blue', 'red'), each=c(best_nsig*ncol(exposures_est)/6),  3*length(exposures_read)/6)
+# )
 
 head(data_cor_est_true)
 
@@ -182,15 +217,18 @@ pheatmap::pheatmap(cors_true_est_sig_exp)
 ## ------------------------------------------------------------------------------------------ ##
 
 ## with fewer segments
-lMats_fewerfeats <- generateSampleByComponentMatrix_mod(CN_feature = list(segsize=features$segsize),
-                                                        # all_components = list(segsize=fmm$segsize),
-                                                        all_components = fmm,
-                                                        feats=c("segsize"))
-sigs_optimalk_fewerfeats <- chooseNumberSignatures(lMats_fewerfeats, iter=2, max_sig = 7)
-best_nsig_fewerfeats <- best_coph(sigs_optimalk_fewerfeats)
+for(feat in names(features)){
+  lMats_fewerfeats <- generateSampleByComponentMatrix_mod(CN_feature = list(segsize=features[[feat]]),
+                                                          all_components = fmm,
+                                                          feats=c(feat))
+  sigs_optimalk_fewerfeats <- chooseNumberSignatures(lMats_fewerfeats, iter=2, max_sig = 7)
+  best_nsig_fewerfeats <- best_coph(sigs_optimalk_fewerfeats)
+  
+  saveRDS(list(lMats_fewerfeats=lMats_fewerfeats,
+               sigs_optimalk_fewerfeats=sigs_optimalk_fewerfeats,
+               best_nsig_fewerfeats=best_nsig_fewerfeats),
+          paste0(sigset, "/sigextraction_", feat, ".RDS"))
 
-
-generateSampleByComponentMatrix_mod
-
+}
 
 
