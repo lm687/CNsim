@@ -22,16 +22,13 @@ samtools_sort = "/home/lm687/software/samtools-1.13/samtools sort"
 samtools_index = "/home/lm687/software/samtools-1.13/samtools index"
 
 
-print(a[1:4])
-
 rule all:
     input:
       # expand("output/output_{genome}/reads/sim_transloc_reads{name}.fa", name=a[0], genome = "genome2")
       # expand("output/output_{genome}/alignments/aligned_sim_transloc_reads{name}.bam", name=a[0], genome = "genome2")
       # expand("output/output_{genome}/plots_segmented/plotCN_{name}_nreads{nreads}_sizedels{size_deletion}_binsize{binsize}_ACE08cellularity.pdf", name=a, nreads = [12000], size_deletion = [1000], genome = "genome2", binsize="002")
       # expand("output/output_{genome}/plots_segmented/plotCN_{name}_nreads{nreads}_sizedels{size_deletion}_ACE08cellularity.pdf", name=a, nreads = [4000], size_deletion = [1000], genome = "genome2")
-      #expand("output/output_{genome}/outputRSVSim/{sigset}/{name}.RDS", name=a, genome = "genome2", sigset=sigset)
-      expand("output/output_{genome}/direct_sigextraction/sigset1/sigextraction_optimalk_allfeats.RDS", genome = "genome2")
+      expand("output/output_{genome}/direct_sigextraction/{sigset}/sigextraction_optimalk_allfeats.RDS", genome = "genome2", sigset=sigset)
 
 
 rule create_genome:
@@ -76,12 +73,11 @@ rule rsvsim:
 
 rule sig_extraction:
     input:
-        lambda wildcards: expand("output/output_{wildcards.genome}/outputRSVSim/{wildcards.sigset}/{name}.RDS", name=a)
+        lambda wildcards: expand("output/output_{genome}/outputRSVSim/{sigset}/{name}.RDS", name=a, sigset=wildcards.sigset, genome=wildcards.genome)
     output:
-        "output/output_{wildcards.genome}/direct_sigextraction/{sigset}/sigextraction_optimalk_allfeats.RDS"
+        "output/output_{genome}/direct_sigextraction/{sigset}/sigextraction_optimalk_allfeats.RDS"
     shell:
-#        "Rscript 3_analyse_results.R --input_list '{wildcards.a}' --sigset {wildcards.genome} --genome {wildcards.genome}"
-         "hehe"
+       "Rscript 3_analyse_results.R --input_list '{input}' --sigset {wildcards.genome} --genome {wildcards.genome}"
 
 
 
