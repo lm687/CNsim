@@ -275,7 +275,7 @@ sim_genome_forwards <- function(which_type_mut, manual_run=F){
           del <- T; ins <- F; dup <- F; inv <- F
           arg_sizeDels <- 200
         }else if(order_sigs[muts_it] == 4){
-          ins = T
+          del <- F; ins <- T; dup <- F; inv <- F
           arg_size_ins = 100
         
       }
