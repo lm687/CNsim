@@ -6,7 +6,9 @@ intNMF/figures/
 *gz
 simulation_from_reviewer/cached_images
 data/
-RSVSim/exposures/
+
+#RSVSim/exposures/
+
 emails/
 intNMF/figures
 
@@ -15,4 +17,6 @@ RSVSim/CNSimGenome2.Rcheck/
 RSVSim/CNSimGenome3.Rcheck/
 RSVSim/CNSimGenome*Rcheck/
 RSVSim/slurm_out/
+
+RSVSim/Homo_sapiens.GRCh37.87.sqlite 
 

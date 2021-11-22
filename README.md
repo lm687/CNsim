@@ -30,3 +30,6 @@ conda install -c conda-forge r-base=4.1.1
 
 
 
+rsync -a output/output_genome2/outputRSVSim/ lm687@login-cpu.hpc.cam.ac.uk:/home/lm687/CNsim/RSVSim/output/output_genome2/outputRSVSim/
+
+
