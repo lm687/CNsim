@@ -1,7 +1,8 @@
 
 library(optparse)
 
-local=T
+#local=T
+local = F
 
 if(local){
   
@@ -24,15 +25,18 @@ if(local){
   opt = parse_args(opt_parser);
 }
 
-
 sigset <- opt$sigset
 
 system(paste0("mkdir -p ", sigset))
 
 source("2_helper_functions.R")
-source("../../../../other_repos/britroc-cnsignatures-bfb69cd72c50/main_functions.R")
-source("../../../../other_repos/britroc-cnsignatures-bfb69cd72c50/helper_functions.R")
-source("../../../../other_repos/britroc-cnsignatures-bfb69cd72c50/")
+
+path_to_cn = as.character(read.table(".path_to_cnsignatures", stringsAsFactors=F))
+print(path_to_cn)
+
+source(paste0(path_to_cn, "/main_functions.R"))
+source(paste0(path_to_cn, "/helper_functions.R"))
+
 
 library(BSgenome)
 library(RSVSim)
@@ -41,24 +45,34 @@ library(ggplot2)
 library(flexmix)
 library(NMF)
 
+input_files = strsplit(opt$input_list, " ")[[1]]
+
 a <- list.files(paste0("output/output_genome2/outputRSVSim/", opt$sigset, "/"), full.names = T)
 exposures <- list.files(paste0("exposures/", opt$sigset, "/"), full.names = T)
-exposures_read <- sapply(exposures, read.table)
-a_read <- lapply(opt$input_list, readRDS)
+
+print(exposures)
+
+cat('Reading exposures\n')
+exposures_read <- sapply(exposures, read.table, stringsAsFactors=F)
+
+cat('Reading simulated genomes\n')
+readRDS(input_files[1])
+
+a_read <- lapply(input_files, readRDS)
+
 
 # a_read <- a_read[match(basename(exposures), gsub(".RDS", "", basename(a)))]
 exposures <- exposures[match(gsub(".RDS", "", basename(a)), basename(exposures))]
 
-exposures_read
-
-a_read[[1]]
-
 
 first_sig <- sapply(exposures_read, `[`, 1)
-first_sig
+cat('Printing first signature')
+
+print(exposures_read)
+print(first_sig)
 hist(first_sig)
 
-a_read
+#a_read
 
 if(opt$genome == "genome2"){
   name_genome <- "output/genome2/genome2.fa"
@@ -113,7 +127,7 @@ table(CN_changepoint_unlist == 0)
 names(segments) <- gsub(".RDS", "", basename(a))
 features <- extractCopynumberFeatures_mod(segments)
 
-if(sum(features$changepoint[,2] == 0) > 0){stop('I do not think there should be changepoints of 0,\
+if(sum(features$changepoint[,2] == 0) > 0){warning('I do not think there should be changepoints of 0,\
 because those are not changepoints')}
 
 features$changepoint[features$changepoint[,2] == 0,]

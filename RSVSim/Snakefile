@@ -1,11 +1,11 @@
 import os
 
-sigset = 'sigset1'
+#sigset = 'sigset1'
 
-if sigset == 'sigset1':
-    a = [x for x in os.listdir("exposures/sigset1/") if x != '.DS_Store']
+#if sigset == 'sigset1':
+#    a = [x for x in os.listdir("exposures/sigset1/") if x != '.DS_Store']
 
-print(a)
+#print(a)
 
 #a = a[:10]
 
@@ -28,7 +28,7 @@ rule all:
       # expand("output/output_{genome}/alignments/aligned_sim_transloc_reads{name}.bam", name=a[0], genome = "genome2")
       # expand("output/output_{genome}/plots_segmented/plotCN_{name}_nreads{nreads}_sizedels{size_deletion}_binsize{binsize}_ACE08cellularity.pdf", name=a, nreads = [12000], size_deletion = [1000], genome = "genome2", binsize="002")
       # expand("output/output_{genome}/plots_segmented/plotCN_{name}_nreads{nreads}_sizedels{size_deletion}_ACE08cellularity.pdf", name=a, nreads = [4000], size_deletion = [1000], genome = "genome2")
-      expand("output/output_{genome}/direct_sigextraction/{sigset}/sigextraction_optimalk_allfeats.RDS", genome = "genome2", sigset=sigset)
+      expand("output/output_{genome}/direct_sigextraction/{sigset}/sigextraction_optimalk_allfeats.RDS", genome = "genome2", sigset=['sigset1', 'sigset2', 'sigset3', 'sigset4'])
 
 
 rule create_genome:
@@ -73,11 +73,12 @@ rule rsvsim:
 
 rule sig_extraction:
     input:
-        lambda wildcards: expand("output/output_{genome}/outputRSVSim/{sigset}/{name}.RDS", name=a, sigset=wildcards.sigset, genome=wildcards.genome)
+        lambda wildcards: expand("output/output_{genome}/outputRSVSim/{sigset}/{name}.RDS", name=[x for x in os.listdir("exposures/"+wildcards.sigset+"/") if x != '.DS_Store'],\
+            sigset=wildcards.sigset, genome=wildcards.genome)
     output:
         "output/output_{genome}/direct_sigextraction/{sigset}/sigextraction_optimalk_allfeats.RDS"
     shell:
-       "Rscript 3_analyse_results.R --input_list '{input}' --sigset {wildcards.genome} --genome {wildcards.genome}"
+       "Rscript 3_analyse_results.R --input_list '{input}' --sigset {wildcards.sigset} --genome {wildcards.genome}"
 
 
 
