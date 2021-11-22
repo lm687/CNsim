@@ -40,6 +40,8 @@ source(paste0(path_to_cn, "/helper_functions.R"))
 
 library(BSgenome)
 library(RSVSim)
+library(ComplexHeatmap)
+library(pheatmap)
 library(reshape2)
 library(ggplot2)
 library(flexmix)
