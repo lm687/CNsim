@@ -235,7 +235,7 @@ sim_genome_forwards <- function(which_type_mut, manual_run=F){
         }else{
           stop('Incorrect signature index\n')
         }
-      }if(opt$sigset == "sigset2"){
+      }else if(opt$sigset == "sigset2"){
           ## two signatures
           if(order_sigs[muts_it] == 1){
             
@@ -253,7 +253,7 @@ sim_genome_forwards <- function(which_type_mut, manual_run=F){
             arg_maxDups <- 1
             
           }
-      }if(opt$sigset == "sigset3"){
+      }else if(opt$sigset == "sigset3"){
         ## 4 sigs
         if(order_sigs[muts_it] == 1){
           
@@ -280,7 +280,7 @@ sim_genome_forwards <- function(which_type_mut, manual_run=F){
         
       }
       
-    }if(opt$sigset == "sigset4"){
+    }else if(opt$sigset == "sigset4"){
       ## 3 sigs
       if(order_sigs[muts_it] == 1){
         
@@ -303,7 +303,10 @@ sim_genome_forwards <- function(which_type_mut, manual_run=F){
         arg_sizeDels <- 200
         
       }
+    }else{
+      stop('Incorrect sigset\n')
     }
+      
     }
 
   
