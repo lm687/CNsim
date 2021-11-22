@@ -235,7 +235,7 @@ sim_genome_forwards <- function(which_type_mut, manual_run=F){
         }else{
           stop('Incorrect signature index\n')
         }
-        if(opt$sigset == "sigset2"){
+      }if(opt$sigset == "sigset2"){
           ## two signatures
           if(order_sigs[muts_it] == 1){
             
@@ -253,7 +253,57 @@ sim_genome_forwards <- function(which_type_mut, manual_run=F){
             arg_maxDups <- 1
             
           }
-        }
+      }if(opt$sigset == "sigset3"){
+        ## 4 sigs
+        if(order_sigs[muts_it] == 1){
+          
+          ## small tandem duplications
+          del <- F; ins <- F; dup <- T; inv <- F
+          arg_sizeDups <- 10
+          arg_maxDups <- 4
+          
+        }else if(order_sigs[muts_it] == 2){
+          
+          ## large duplications
+          
+          del <- F; ins <- F; dup <- T; inv <- F
+          arg_sizeDups <- 500
+          arg_maxDups <- 1
+          
+        }else if(order_sigs[muts_it] == 3){
+          ## one signature that creates deletions      
+          del <- T; ins <- F; dup <- F; inv <- F
+          arg_sizeDels <- 200
+        }else if(order_sigs[muts_it] == 4){
+          ins = T
+          arg_size_ins = 100
+        
+      }
+      
+    }if(opt$sigset == "sigset4"){
+      ## 3 sigs
+      if(order_sigs[muts_it] == 1){
+        
+        ## small tandem duplications
+        del <- F; ins <- F; dup <- T; inv <- F
+        arg_sizeDups <- 10
+        arg_maxDups <- 4
+        
+      }else if(order_sigs[muts_it] == 2){
+        
+        ## large duplications
+        del <- F; ins <- F; dup <- T; inv <- F
+        arg_sizeDups <- 500
+        arg_maxDups <- 1
+        
+      }else if(order_sigs[muts_it] == 3){
+        
+        ## one signature that creates deletions      
+        del <- T; ins <- F; dup <- F; inv <- F
+        arg_sizeDels <- 200
+        
+      }
+    }
     }
 
   
