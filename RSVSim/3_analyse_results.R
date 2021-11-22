@@ -167,10 +167,10 @@ table(features$changepoint$value) ## good
 
 fmm <- fitMixtureModels_mod(features)
 # fmm <- fitMixtureModels(features, featsToFit = c(1, 2, 5))
-saveRDS(fmm, paste0(sigset, "/sigextraction_fmm", ".RDS"))
+saveRDS(fmm, paste0("output/output_", opt$genome, "/direct_sigextraction/", sigset, "/sigextraction_fmm", ".RDS"))
 
 lMats <- generateSampleByComponentMatrix_mod(CN_feature = features, all_components = fmm, feats=names(fmm))
-saveRDS(lMats, paste0(sigset, "/sigextraction_SxC", ".RDS"))
+saveRDS(lMats, paste0("output/output_", opt$genome, "/direct_sigextraction/", sigset, "/sigextraction_SxC", ".RDS"))
 
 ## need to find optimal number of signatures
 
@@ -184,7 +184,7 @@ best_coph <- function(opt_res){
 best_nsig <- best_coph(sigs_optimalk)
 
 sigs <- generateSignatures_mod(lMats, nsig = best_nsig, nrun=2)
-saveRDS(sigs, paste0(sigset, "/sigextraction_optimalk_allfeats", ".RDS"))
+saveRDS(sigs, paste0("output/output_", opt$genome, "/direct_sigextraction/", sigset, "/sigextraction_optimalk_allfeats", ".RDS"))
 
 image(sigs@consensus)
 exposures_est <- coefficients(sigs)
@@ -227,7 +227,7 @@ for(feat in names(features)){
   saveRDS(list(lMats_fewerfeats=lMats_fewerfeats,
                sigs_optimalk_fewerfeats=sigs_optimalk_fewerfeats,
                best_nsig_fewerfeats=best_nsig_fewerfeats),
-          paste0(sigset, "/sigextraction_", feat, ".RDS"))
+          paste0("output/output_", opt$genome, "/direct_sigextraction/", sigset, "/sigextraction_", feat, ".RDS"))
 
 }
 
