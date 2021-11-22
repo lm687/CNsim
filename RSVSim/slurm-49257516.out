@@ -1,0 +1,78 @@
+Building DAG of jobs...
+Using shell: /usr/bin/bash
+Provided cores: 1 (use --cores to define parallelism)
+Rules claiming more threads will be scaled down.
+Select jobs to execute...
+
+[Tue Nov  9 12:47:10 2021]
+rule segment:
+    input: output/output_genome2/alignments/aligned_sim_transloc_reads338ec77e-a5fa-4263-9540-c83aaee41d8b_nreads12000_sizedels1000.bam
+    output: output/output_genome2/plots_segmented/plotCN_338ec77e-a5fa-4263-9540-c83aaee41d8b_nreads12000_sizedels1000_binsize002_ACE08cellularity.pdf
+    jobid: 0
+    wildcards: genome=genome2, name=338ec77e-a5fa-4263-9540-c83aaee41d8b, nreads=12000, size_deletion=1000, binsize=002
+    resources: mem_mb=1000, disk_mb=1000, tmpdir=/tmp
+
+mkdir -p output/output_genome2/plots_segmented/; Rscript 4_segment.R --name 338ec77e-a5fa-4263-9540-c83aaee41d8b --genome genome2 --size_deletion 1000 --nreads 12000 --size_bin 002
+Loading required package: Biostrings
+Loading required package: BiocGenerics
+Loading required package: parallel
+
+Attaching package: ‘BiocGenerics’
+
+The following objects are masked from ‘package:parallel’:
+
+    clusterApply, clusterApplyLB, clusterCall, clusterEvalQ,
+    clusterExport, clusterMap, parApply, parCapply, parLapply,
+    parLapplyLB, parRapply, parSapply, parSapplyLB
+
+The following objects are masked from ‘package:stats’:
+
+    IQR, mad, sd, var, xtabs
+
+The following objects are masked from ‘package:base’:
+
+    anyDuplicated, append, as.data.frame, basename, cbind, colnames,
+    dirname, do.call, duplicated, eval, evalq, Filter, Find, get, grep,
+    grepl, intersect, is.unsorted, lapply, Map, mapply, match, mget,
+    order, paste, pmax, pmax.int, pmin, pmin.int, Position, rank,
+    rbind, Reduce, rownames, sapply, setdiff, sort, table, tapply,
+    union, unique, unsplit, which.max, which.min
+
+Loading required package: S4Vectors
+Loading required package: stats4
+
+Attaching package: ‘S4Vectors’
+
+The following objects are masked from ‘package:base’:
+
+    expand.grid, I, unname
+
+Loading required package: IRanges
+Loading required package: XVector
+Loading required package: GenomeInfoDb
+
+Attaching package: ‘Biostrings’
+
+The following object is masked from ‘package:base’:
+
+    strsplit
+
+Loading required package: GenomicRanges
+Welcome to Bioconductor
+
+    Vignettes contain introductory material; view with
+    'browseVignettes()'. To cite Bioconductor, see
+    'citation("Biobase")', and for packages 'citation("pkgname")'.
+
+Error: Specify a correct <size_bin>
+Execution halted
+[Tue Nov  9 12:47:21 2021]
+Error in rule segment:
+    jobid: 0
+    output: output/output_genome2/plots_segmented/plotCN_338ec77e-a5fa-4263-9540-c83aaee41d8b_nreads12000_sizedels1000_binsize002_ACE08cellularity.pdf
+    shell:
+        mkdir -p output/output_genome2/plots_segmented/; Rscript 4_segment.R --name 338ec77e-a5fa-4263-9540-c83aaee41d8b --genome genome2 --size_deletion 1000 --nreads 12000 --size_bin 002
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+Shutting down, this might take some time.
+Exiting because a job execution failed. Look above for error message

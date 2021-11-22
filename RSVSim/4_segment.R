@@ -25,7 +25,7 @@ if(local_bool){
   option_list = list(
     make_option(c("--name"), type="character", default=NA,
                 help="name (uuid)", metavar="character"),
-    make_option(c("--size_bin"), type="double", default='02',
+    make_option(c("--size_bin"), type="character", default='02',
                 help="size of bin for CN extraction",
                 metavar="character"),
     make_option(c("--size_deletion"), type="double", default=200,
@@ -48,6 +48,8 @@ if(local_bool){
 
 if(opt$size_bin == "02"){
   bins_genome <- readRDS(file = paste0("output/", opt$genome, "/bins_genome02.RDS"))
+}else if(opt$size_bin == "002"){
+  bins_genome <- readRDS(file = paste0("output/", opt$genome, "/bins_genome002.RDS"))
 }else if(opt$size_bin == "0002"){
   bins_genome <- readRDS(file = paste0("output/", opt$genome, "/bins_genome0002.RDS"))
 }else{
