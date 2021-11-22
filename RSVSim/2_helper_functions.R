@@ -302,3 +302,8 @@ generateSampleByComponentMatrix_mod<-function(CN_features, all_components=NULL, 
   full_mat[is.na(full_mat)]<-0
   full_mat
 }
+
+
+generateSignatures_mod <- function(sample_by_component,nsig,seed=77777,nmfalg="brunet", cores=1, nrun_arg=1000){
+  NMF::nmf(t(sample_by_component),nsig,seed=seed,nrun=nrun_arg,method=nmfalg,.opt = paste0("p", cores), )
+}
