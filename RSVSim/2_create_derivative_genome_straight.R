@@ -53,21 +53,22 @@ if(opt$sigset ==  "sigset1"){
 }
 
  
-if(opt$sigset ==  "sigset1"){
-  exposures <- readLines(paste0("exposures/sigset1/", opt$name))
-  exposures <- as.numeric(exposures)
-  # exposures <- c(0.2, 0.3, 0.5)
-  cat('Number of events ', opt$num_events, '\n')
-  cat('Exposures ', exposures, '\n')
-  ## get number of events created by each signature
-  num_events_per_sig <- round(exposures*opt$num_events)
-  order_sigs <- sample(1:length(exposures), size = opt$num_events, prob = exposures, replace = T)
-}
+exposures <- readLines(paste0("exposures/", opt$sigset, "/", opt$name))
+exposures <- as.numeric(exposures)
+# exposures <- c(0.2, 0.3, 0.5)
+cat('Number of events ', opt$num_events, '\n')
+cat('Exposures ', exposures, '\n')
+## get number of events created by each signature
+num_events_per_sig <- round(exposures*opt$num_events)
+order_sigs <- sample(1:length(exposures), size = opt$num_events, prob = exposures, replace = T)
 
 # library(optparse)
 
-name_genome <- "output/genome2/genome2.fa"
-
+if(opt$genome ==  "genome2"){
+  name_genome <- "output/genome2/genome2.fa"
+}else{
+  'Only genome 2 implemented for now'
+}
 genome <- readBStringSet(name_genome, format="fasta",
                          nrec=-1L, skip=0L, seek.first.rec=FALSE,
                          use.names=TRUE, with.qualities=FALSE)
@@ -234,7 +235,25 @@ sim_genome_forwards <- function(which_type_mut, manual_run=F){
         }else{
           stop('Incorrect signature index\n')
         }
-      }
+        if(opt$sigset == "sigset2"){
+          ## two signatures
+          if(order_sigs[muts_it] == 1){
+            
+            ## small tandem duplications
+            del <- F; ins <- F; dup <- T; inv <- F
+            arg_sizeDups <- 10
+            arg_maxDups <- 4
+            
+          }else if(order_sigs[muts_it] == 2){
+            
+            ## large duplications
+            
+            del <- F; ins <- F; dup <- T; inv <- F
+            arg_sizeDups <- 500
+            arg_maxDups <- 1
+            
+          }
+        }
     }
 
   
