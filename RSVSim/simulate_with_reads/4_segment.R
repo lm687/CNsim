@@ -48,6 +48,8 @@ if(local_bool){
 
 if(opt$size_bin == "02"){
   bins_genome <- readRDS(file = paste0("output/", opt$genome, "/bins_genome02.RDS"))
+}else if(opt$size_bin == "002"){
+  bins_genome <- readRDS(file = paste0("output/", opt$genome, "/bins_genome002.RDS"))
 }else if(opt$size_bin == "0002"){
   bins_genome <- readRDS(file = paste0("output/", opt$genome, "/bins_genome0002.RDS"))
 }else{
