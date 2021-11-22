@@ -1,6 +1,9 @@
 import os
 
-a = [x for x in os.listdir("exposures") if x != '.DS_Store']
+sigset = 'sigset1'
+
+if sigset == 'sigset1':
+    a = [x for x in os.listdir("exposures/sigset1/") if x != '.DS_Store']
 # print(a)
 
 #a = a[:10]
@@ -22,7 +25,8 @@ rule all:
     input:
       # expand("output/output_{genome}/reads/sim_transloc_reads{name}.fa", name=a[0], genome = "genome2")
       # expand("output/output_{genome}/alignments/aligned_sim_transloc_reads{name}.bam", name=a[0], genome = "genome2")
-      expand("output/output_{genome}/plots_segmented/plotCN_{name}_nreads{nreads}_sizedels{size_deletion}_ACE08cellularity.pdf", name=a, nreads = [4000], size_deletion = [1000], genome = "genome2")
+      # expand("output/output_{genome}/plots_segmented/plotCN_{name}_nreads{nreads}_sizedels{size_deletion}_ACE08cellularity.pdf", name=a, nreads = [4000], size_deletion = [1000], genome = "genome2")
+      expand("output/output_{genome}/outputRSVSim/{sigset}/{name}.RDS", name=a, genome = "genome2", sigset=sigset)
 
 rule create_genome:
     input:
@@ -53,4 +57,13 @@ rule segment:
         "output/output_{genome}/plots_segmented/plotCN_{name}_nreads{nreads}_sizedels{size_deletion}_ACE08cellularity.pdf"
     shell:
         "mkdir -p output/output_{wildcards.genome}/plots_segmented/; Rscript 4_segment.R --name {wildcards.name} --genome {wildcards.genome} --size_deletion {wildcards.size_deletion} --nreads {wildcards.nreads}"
+
+
+rule rsvsim:
+    input:
+        "exposures/{sigset}/{name}"
+    output:
+        "output/output_{genome}/outputRSVSim/{sigset}/{name}.RDS"
+    shell:
+        "Rscript 2_create_derivative_genome_straight.R  --name {wildcards.name} --genome {wildcards.genome} --sigset {wildcards.sigset}"
 
