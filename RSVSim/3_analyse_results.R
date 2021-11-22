@@ -36,6 +36,8 @@ source("../../../../other_repos/britroc-cnsignatures-bfb69cd72c50/")
 
 library(BSgenome)
 library(RSVSim)
+library(ComplexHeatmap)
+library(pheatmap)
 library(reshape2)
 library(ggplot2)
 library(flexmix)

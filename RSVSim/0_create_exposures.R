@@ -36,6 +36,6 @@ for(i in 1:500){
 system("mkdir -p exposures/sigset4/")
 for(i in 1:500){
   .uuid <- uuid::UUIDgenerate()
-  write(x = paste0(MCMCpack::rdirichlet(1, c(1/3, 1/3, 1/3))), file = paste0("exposures/sigset3/", .uuid))
+  write(x = paste0(MCMCpack::rdirichlet(1, c(1/3, 1/3, 1/3))), file = paste0("exposures/sigset4/", .uuid))
 }
 
