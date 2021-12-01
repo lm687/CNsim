@@ -52,41 +52,17 @@ input_files = strsplit(opt$input_list, " ")[[1]]
 a <- list.files(paste0("output/output_genome2/outputRSVSim/", opt$sigset, "/"), full.names = T)
 exposures <- list.files(paste0("exposures/", opt$sigset, "/"), full.names = T)
 
-<<<<<<< HEAD
-print(exposures)
-
 cat('Reading exposures\n')
 exposures_read <- sapply(exposures, read.table, stringsAsFactors=F)
-=======
-a_read <- a_read[match(basename(exposures), gsub(".RDS", "", basename(a)))]
-# exposures <- exposures[match(gsub(".RDS", "", basename(a)), basename(exposures))]
->>>>>>> 0f1965355b72a67d67f83986e98239c01a47350a
 
 cat('Reading simulated genomes\n')
 readRDS(input_files[1])
 
 a_read <- lapply(input_files, readRDS)
-
-
 a_read <- a_read[match(basename(exposures), gsub(".RDS", "", basename(a)))]
 #exposures <- exposures[match(gsub(".RDS", "", basename(a)), basename(exposures))]
 
-
 first_sig <- sapply(exposures_read, `[`, 1)
-<<<<<<< HEAD
-cat('Printing first signature')
-
-print(exposures_read)
-print(first_sig)
-hist(first_sig)
-
-#a_read
-=======
-# first_sig
-# hist(first_sig)
-
-# a_read
->>>>>>> 0f1965355b72a67d67f83986e98239c01a47350a
 
 if(opt$genome == "genome2"){
   name_genome <- "output/genome2/genome2.fa"
@@ -193,12 +169,8 @@ table(features$copynumber$value) ## good
 table(features$segsize$value) ## good
 table(features$changepoint$value) ## good
 
-<<<<<<< HEAD
 saveRDS(features, paste0("output/output_", opt$genome, "/direct_sigextraction/", sigset, "/sigextraction_features", ".RDS"))
 
-
-=======
->>>>>>> 0f1965355b72a67d67f83986e98239c01a47350a
 cat('Fitting fmm\n')
 fmm <- fitMixtureModels_mod(features)
 # fmm <- fitMixtureModels(features, featsToFit = c(1, 2, 5))
