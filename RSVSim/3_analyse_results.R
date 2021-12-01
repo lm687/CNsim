@@ -19,7 +19,9 @@ if(local){
     make_option(c("--sigset"), type="character", default=NA,
                 help="set of signatures that we are using", metavar="character"),
     make_option(c("--genome"), type="character", default=NA,
-                help="name of genome to use", metavar="character"));
+                help="name of genome to use", metavar="character"),
+    make_option(c("--num_events"), type="numeric", default=20,
+                help="number of events", metavar="numeric"));
   opt_parser = OptionParser(option_list=option_list);
   opt = parse_args(opt_parser);
 }
@@ -33,6 +35,8 @@ source("2_helper_functions.R")
 source("../../../../other_repos/britroc-cnsignatures-bfb69cd72c50/main_functions.R")
 source("../../../../other_repos/britroc-cnsignatures-bfb69cd72c50/helper_functions.R")
 source("../../../../other_repos/britroc-cnsignatures-bfb69cd72c50/")
+
+folderout = paste0("output/output_", opt$genome, "/direct_sigextraction/", sigset, "/numevents", opt$num_events, "_")
 
 library(BSgenome)
 library(RSVSim)
@@ -168,12 +172,15 @@ table(features$segsize$value) ## good
 table(features$changepoint$value) ## good
 
 cat('Fitting fmm\n')
-fmm <- fitMixtureModels_mod(features)
+# features <- readRDS("output/output_genome2/direct_sigextraction/sigset4/sigextraction_features.RDS")
+features$segsize$value <- as.numeric(features$segsize$value)
+features$osCN$value <- as.numeric(features$osCN$value)
+fmm <- fitMixtureModels_mod(features[1])
 # fmm <- fitMixtureModels(features, featsToFit = c(1, 2, 5))
-saveRDS(fmm, paste0("output/output_", opt$genome, "/direct_sigextraction/", sigset, "/sigextraction_fmm", ".RDS"))
+saveRDS(fmm, paste0(folderout, "sigextraction_fmm", ".RDS"))
 
 lMats <- generateSampleByComponentMatrix_mod(CN_feature = features, all_components = fmm, feats=names(fmm))
-saveRDS(lMats, paste0("output/output_", opt$genome, "/direct_sigextraction/", sigset, "/sigextraction_SxC", ".RDS"))
+saveRDS(lMats, paste0(folderout, "sigextraction_SxC", ".RDS"))
 
 ## need to find optimal number of signatures
 
@@ -187,7 +194,7 @@ best_coph <- function(opt_res){
 best_nsig <- best_coph(sigs_optimalk)
 
 sigs <- generateSignatures_mod(lMats, nsig = best_nsig, nrun=2)
-saveRDS(sigs, paste0("output/output_", opt$genome, "/direct_sigextraction/", sigset, "/sigextraction_optimalk_allfeats", ".RDS"))
+saveRDS(sigs, paste0(folderout, "sigextraction_optimalk_allfeats", ".RDS"))
 
 ## ------------------------------------------------------------------------------------------ ##
 ## ------------------------------------------------------------------------------------------ ##
@@ -203,7 +210,7 @@ for(feat in names(features)){
   saveRDS(list(lMats_fewerfeats=lMats_fewerfeats,
                sigs_optimalk_fewerfeats=sigs_optimalk_fewerfeats,
                best_nsig_fewerfeats=best_nsig_fewerfeats),
-          paste0("output/output_", opt$genome, "/direct_sigextraction/", sigset, "/sigextraction_", feat, ".RDS"))
+          paste0(folderout, "sigextraction_", feat, ".RDS"))
 
 }
 

@@ -28,7 +28,7 @@ rule all:
       # expand("output/output_{genome}/alignments/aligned_sim_transloc_reads{name}.bam", name=a[0], genome = "genome2")
       # expand("output/output_{genome}/plots_segmented/plotCN_{name}_nreads{nreads}_sizedels{size_deletion}_binsize{binsize}_ACE08cellularity.pdf", name=a, nreads = [12000], size_deletion = [1000], genome = "genome2", binsize="002")
       # expand("output/output_{genome}/plots_segmented/plotCN_{name}_nreads{nreads}_sizedels{size_deletion}_ACE08cellularity.pdf", name=a, nreads = [4000], size_deletion = [1000], genome = "genome2")
-      expand("output/output_{genome}/direct_sigextraction/{sigset}/sigextraction_optimalk_allfeats.RDS", genome = "genome2", sigset=sigset)
+      expand("output/output_{genome}/direct_sigextraction/{sigset}/numevents{num_events}_sigextraction_optimalk_allfeats.RDS", genome = "genome2", sigset=sigset, num_events=40)
 
 
 rule create_genome:
@@ -66,16 +66,16 @@ rule rsvsim:
     input:
         "exposures/{sigset}/{name}"
     output:
-        "output/output_{genome}/outputRSVSim/{sigset}/{name}.RDS"
+        "output/output_{genome}/outputRSVSim/{sigset}_{num_events}/{name}.RDS"
     shell:
-        "Rscript 2_create_derivative_genome_straight.R  --name {wildcards.name} --genome {wildcards.genome} --sigset {wildcards.sigset}"
+        "Rscript 2_create_derivative_genome_straight.R  --name {wildcards.name} --genome {wildcards.genome} --num_events {wildcards.num_events} --sigset {wildcards.sigset}"
 
 
 rule sig_extraction:
     input:
-        lambda wildcards: expand("output/output_{genome}/outputRSVSim/{sigset}/{name}.RDS", name=a, sigset=wildcards.sigset, genome=wildcards.genome)
+        lambda wildcards: expand("output/output_{genome}/outputRSVSim/{sigset}_{num_events}/{name}.RDS", name=a, sigset=wildcards.sigset, num_events=wildcards.num_events, genome=wildcards.genome)
     output:
-        "output/output_{genome}/direct_sigextraction/{sigset}/sigextraction_optimalk_allfeats.RDS"
+        "output/output_{genome}/direct_sigextraction/{sigset}/numevents{num_events}_sigextraction_optimalk_allfeats.RDS"
     shell:
        "Rscript 3_analyse_results.R --input_list '{input}' --sigset {wildcards.genome} --genome {wildcards.genome}"
 
