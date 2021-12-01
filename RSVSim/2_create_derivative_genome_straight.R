@@ -427,8 +427,8 @@ sim_genome_forwards <- function(which_type_mut, manual_run=F){
 
 genome_derivative <- sim_genome_forwards(which_type_mut = NA, manual_run=F)
 
-system(paste0("mkdir -p ", "output/output_genome2//outputRSVSim/", opt$sigset, "/"))
-out_file <- paste0("output/output_genome2/outputRSVSim/", opt$sigset, "/", opt$name, ".RDS")
+system(paste0("mkdir -p ", "output/output_genome2//outputRSVSim/", opt$sigset,  '_', opt$num_events, "/"))
+out_file <- paste0("output/output_genome2/outputRSVSim/", opt$sigset, '_', opt$num_events, "/", opt$name, ".RDS")
 cat('Saving output file ', out_file, '\n')
 saveRDS(genome_derivative, file = out_file)
 

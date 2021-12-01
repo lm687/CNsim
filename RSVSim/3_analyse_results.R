@@ -20,7 +20,9 @@ if(local){
     make_option(c("--sigset"), type="character", default=NA,
                 help="set of signatures that we are using", metavar="character"),
     make_option(c("--genome"), type="character", default=NA,
-                help="name of genome to use", metavar="character"));
+                help="name of genome to use", metavar="character"),
+    make_option(c("--num_events"), type="numeric", default=20,
+                help="number of events", metavar="numeric"));
   opt_parser = OptionParser(option_list=option_list);
   opt = parse_args(opt_parser);
 }
@@ -37,6 +39,8 @@ print(path_to_cn)
 source(paste0(path_to_cn, "/main_functions.R"))
 source(paste0(path_to_cn, "/helper_functions.R"))
 
+
+folderout = paste0("output/output_", opt$genome, "/direct_sigextraction/", sigset, "/numevents", opt$num_events, "_")
 
 library(BSgenome)
 library(RSVSim)
@@ -172,26 +176,36 @@ table(features$changepoint$value) ## good
 saveRDS(features, paste0("output/output_", opt$genome, "/direct_sigextraction/", sigset, "/sigextraction_features", ".RDS"))
 
 cat('Fitting fmm\n')
-fmm <- fitMixtureModels_mod(features)
-# fmm <- fitMixtureModels(features, featsToFit = c(1, 2, 5))
-saveRDS(fmm, paste0("output/output_", opt$genome, "/direct_sigextraction/", sigset, "/sigextraction_fmm", ".RDS"))
+# features <- readRDS("output/output_genome2/direct_sigextraction/sigset4/sigextraction_features.RDS")
+features$segsize$value <- as.numeric(features$segsize$value)
+features$osCN$value <- as.numeric(features$osCN$value)
+fmm <- try(fitMixtureModels_mod(features))
 
-lMats <- generateSampleByComponentMatrix_mod(CN_feature = features, all_components = fmm, feats=names(fmm))
-saveRDS(lMats, paste0("output/output_", opt$genome, "/direct_sigextraction/", sigset, "/sigextraction_SxC", ".RDS"))
+if(typeof(fmm) != "character"){
+
+   # fmm <- fitMixtureModels(features, featsToFit = c(1, 2, 5))
+   saveRDS(fmm, paste0(folderout, "sigextraction_fmm", ".RDS"))
+
+   lMats <- generateSampleByComponentMatrix_mod(CN_feature = features, all_components = fmm, feats=names(fmm))
+   saveRDS(lMats, paste0(folderout, "sigextraction_SxC", ".RDS"))
 
 ## need to find optimal number of signatures
 
-sigs_optimalk <- chooseNumberSignatures(lMats, iter=2, max_sig = 7)
-## select based on cophenetic idx
-best_coph <- function(opt_res){
-  .x <- (opt_res$data[opt_res$data$variable == 'cophenetic',])
-  .x <- .x[order(.x$value, decreasing = T),]
-  .x[1,'rank']
-}
-best_nsig <- best_coph(sigs_optimalk)
+   sigs_optimalk <- chooseNumberSignatures(lMats, iter=2, max_sig = 7)
+   ## select based on cophenetic idx
+   best_coph <- function(opt_res){
+     .x <- (opt_res$data[opt_res$data$variable == 'cophenetic',])
+     .x <- .x[order(.x$value, decreasing = T),]
+     .x[1,'rank']
+   }
+   best_nsig <- best_coph(sigs_optimalk)
 
-sigs <- generateSignatures_mod(lMats, nsig = best_nsig, nrun=2)
-saveRDS(sigs, paste0("output/output_", opt$genome, "/direct_sigextraction/", sigset, "/sigextraction_optimalk_allfeats", ".RDS"))
+   sigs <- generateSignatures_mod(lMats, nsig = best_nsig, nrun=2)
+   saveRDS(sigs, paste0(folderout, "sigextraction_optimalk_allfeats", ".RDS"))
+}else{
+   saveRDS(NA, paste0(folderout, "sigextraction_fmm", ".RDS"))
+   saveRDS(NA, paste0(folderout, "sigextraction_optimalk_allfeats", ".RDS"))
+}
 
 ## ------------------------------------------------------------------------------------------ ##
 ## ------------------------------------------------------------------------------------------ ##
@@ -210,7 +224,7 @@ for(feat in names(features)){
   saveRDS(list(lMats_fewerfeats=lMats_fewerfeats,
                sigs_optimalk_fewerfeats=sigs_optimalk_fewerfeats,
                best_nsig_fewerfeats=best_nsig_fewerfeats),
-          paste0("output/output_", opt$genome, "/direct_sigextraction/", sigset, "/sigextraction_", feat, ".RDS"))
+          paste0(folderout, "sigextraction_", feat, ".RDS"))
 
 }
 
