@@ -57,10 +57,10 @@ a_read[[1]]
 
 
 first_sig <- sapply(exposures_read, `[`, 1)
-first_sig
-hist(first_sig)
+# first_sig
+# hist(first_sig)
 
-a_read
+# a_read
 
 if(opt$genome == "genome2"){
   name_genome <- "output/genome2/genome2.fa"
@@ -118,9 +118,9 @@ features <- extractCopynumberFeatures_mod(segments)
 if(sum(features$changepoint[,2] == 0) > 0){stop('I do not think there should be changepoints of 0,\
 because those are not changepoints')}
 
-features$changepoint[features$changepoint[,2] == 0,]
+# features$changepoint[features$changepoint[,2] == 0,]
 
-getChangepointCN(segments)
+# getChangepointCN(segments)
 
 # #----------------------------------------------------------------------------------------------------------------
 # #----------------------------------------------------------------------------------------------------------------
