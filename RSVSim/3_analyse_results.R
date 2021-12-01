@@ -63,8 +63,8 @@ readRDS(input_files[1])
 a_read <- lapply(input_files, readRDS)
 
 
-# a_read <- a_read[match(basename(exposures), gsub(".RDS", "", basename(a)))]
-exposures <- exposures[match(gsub(".RDS", "", basename(a)), basename(exposures))]
+a_read <- a_read[match(basename(exposures), gsub(".RDS", "", basename(a)))]
+#exposures <- exposures[match(gsub(".RDS", "", basename(a)), basename(exposures))]
 
 
 first_sig <- sapply(exposures_read, `[`, 1)
@@ -181,6 +181,10 @@ table(features$copynumber$value) ## good
 table(features$segsize$value) ## good
 table(features$changepoint$value) ## good
 
+saveRDS(features, paste0("output/output_", opt$genome, "/direct_sigextraction/", sigset, "/sigextraction_features", ".RDS"))
+
+
+cat('Fitting fmm\n')
 fmm <- fitMixtureModels_mod(features)
 # fmm <- fitMixtureModels(features, featsToFit = c(1, 2, 5))
 saveRDS(fmm, paste0("output/output_", opt$genome, "/direct_sigextraction/", sigset, "/sigextraction_fmm", ".RDS"))
@@ -237,9 +241,12 @@ for(feat in names(features)){
   lMats_fewerfeats <- generateSampleByComponentMatrix_mod(CN_feature = list(segsize=features[[feat]]),
                                                           all_components = fmm,
                                                           feats=c(feat))
-  sigs_optimalk_fewerfeats <- chooseNumberSignatures(lMats_fewerfeats, iter=2, max_sig = 7)
-  best_nsig_fewerfeats <- best_coph(sigs_optimalk_fewerfeats)
-  
+  sigs_optimalk_fewerfeats <- try(chooseNumberSignatures(lMats_fewerfeats, iter=2, max_sig = 7))
+  if(typeof(sigs_optimalk_fewerfeats) != "character"){
+    best_nsig_fewerfeats <- best_coph(sigs_optimalk_fewerfeats)
+  }else{
+   best_nsig_fewerfeats = NA 
+  }
   saveRDS(list(lMats_fewerfeats=lMats_fewerfeats,
                sigs_optimalk_fewerfeats=sigs_optimalk_fewerfeats,
                best_nsig_fewerfeats=best_nsig_fewerfeats),

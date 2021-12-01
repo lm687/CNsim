@@ -80,7 +80,16 @@ rule sig_extraction:
     shell:
        "Rscript 3_analyse_results.R --input_list '{input}' --sigset {wildcards.sigset} --genome {wildcards.genome}"
 
-
+## to debug
+#
+#rule sig_extraction_subset_samples:
+#    input:
+#        lambda wildcards: expand("output/output_{genome}/outputRSVSim/{sigset}/{name}.RDS", name=[x for x in os.listdir("exposures/"+wildcards.sigset+"/") if x != '.DS_Store'][0:10],\
+#            sigset=wildcards.sigset, genome=wildcards.genome)
+#    output:
+#        "output/output_{genome}/direct_sigextraction/{sigset}/sigextraction_optimalk_allfeats.RDS"
+#    shell:
+#       "Rscript 3_analyse_results.R --input_list '{input}' --sigset {wildcards.sigset} --genome {wildcards.genome}"
 
 
 
